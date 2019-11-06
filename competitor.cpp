@@ -61,6 +61,45 @@ public:
 
   }
 
+  /* ---USE THIS FUNCTION TO GENERATE A SIGNAL---
+  Currently, I calculate bid and ask volume for all levels.
+  I then calculate (bid_vol - ask_vol)/(bid_vol + ask_vol)
+  */
+  float get_signal() const {
+    bool bid = true, ask = false;
+    price_t best_bid = get_bbo(bid);
+    price_t best_offer = get_bbo(ask);
+
+    int signal = 0;
+
+    if (best_bid == 0.0 || best_offer == 0.0) {
+      return signal; // no signal can be found in this case
+    }
+
+    // Calculate bid volume for all levels
+    quantity_t bid_volume = 0;
+    for (auto& x : sides[bid]) {
+      if (x.price > best_bid) {
+        break;
+      }
+      bid_volume += x.quantity;
+    }
+
+    // Calculate  ask volume for all levels
+    quantity_t ask_volume = 0;
+    for (auto& x : sides[ask]) {
+      if (x.price < best_offer) {
+        break;
+      }
+      ask_volume += x.quantity;
+    }
+
+    // Calculate signal
+    signal = (bid_volume - ask_volume)/(bid_volume + ask_volume);
+
+    return signal;
+  }
+
 
   void insert(Common::Order order_to_insert) {
 
@@ -285,6 +324,18 @@ struct MyState {
     return books[ticker].get_bbo(buy);
   }
 
+  float get_signal(ticker_t ticker) {
+    return books[ticker].get_signal();
+  }
+
+  price_t get_mid_price(ticker_t ticker) {
+    return books[ticker].get_mid_price(0.0);
+  }
+
+  price_t get_spread(ticker_t ticker) {
+    return books[ticker].spread();
+  }
+
   trader_id_t trader_id;
   MyBook books[MAX_NUM_TICKERS];
   std::unordered_set<order_id_t> submitted;
@@ -340,46 +391,111 @@ public:
   void on_order_update(Common::OrderUpdate & update, Bot::Communicator& com){
     state.on_order_update(update);
 
-    // NOTE: the strategy here is dumb, and is just to demonstrate the API
-
-
-    // a way to rate limit yourself
     int64_t now = time_ns();
-    if (now - last < 10e6) { // 10ms
-      return;
-    }
-
+    //if (now - last < 10e6) { // 10ms
+    //  return;
+    //}
     last = now;
 
-
     // a way to cancel all your open orders
-    for (const auto& x : state.open_orders) {
-      place_cancel(com, Common::Cancel{
-        .ticker = 0,
-        .order_id = x.first,
-        .trader_id = trader_id
-      });
-    }
-
-
-    // a way to get your current position
-    quantity_t position = state.positions[0];
+    //for (const auto& x : state.open_orders) {
+    //  place_cancel(com, Common::Cancel{
+    //    .ticker = 0,
+    //    .order_id = x.first,
+    //    .trader_id = trader_id
+    //  });
+    //}
 
     // a way to put in a bid of quantity 1 at the current best bid
     double best_bid = state.get_bbo(0, true);
-    if (best_bid != 0.0 && position < 20) { // 0.0 denotes no bid
+    double best_offer = state.get_bbo(0, false);
+    double mid_price = state.get_mid_price(0);
+    double spread = state.get_spread(0);
+    double signal = state.get_signal(0);
+    double signalToCents = signal/10.0;
+    double newSpread = spread + signalToCents;
+    double new_bid, new_offer;
+    quantity_t position = state.positions[0];
+    double available_position = 2000 - position;
+    quantity_t bid_volume, offer_volume;
 
-      place_order(com, Common::Order{
-        .ticker = 0,
-        .price = best_bid,
-        .quantity = 1,
-        .buy = true,
-        .ioc = false,
-        .order_id = 0, // this order ID will be chosen randomly by com
-        .trader_id = trader_id
-      });
-    }
+    if (signal == 0) {
+      return;
+    } else if (signal > 0) {
+      // Move midprice up proportional to signal
+      if (signal > 0.5) {
+        // Cancel all open orders
+        for (const auto& x : state.open_orders) {
+          place_cancel(com, Common::Cancel{
+            .ticker = 0,
+            .order_id = x.first,
+            .trader_id = trader_id
+          });
+        }
 
+        // Make new market
+        new_bid = mid_price + signalToCents;
+        new_offer = mid_price + signalToCents;
+        bid_volume = available_position/2.0;
+        offer_volume = available_position/2.0;
+
+        place_order(com, Common::Order{
+          .ticker = 0,
+          .price = new_bid,
+          .quantity = bid_volume,
+          .buy = true,
+          .ioc = false,
+          .order_id = 0, // this order ID will be chosen randomly by com
+          .trader_id = trader_id
+        });
+        place_order(com, Common::Order{
+          .ticker = 0,
+          .price = new_offer,
+          .quantity = offer_volume,
+          .buy = false,
+          .ioc = false,
+          .order_id = 0, // this order ID will be chosen randomly by com
+          .trader_id = trader_id
+        });
+      }
+    } else if (signal < 0) {
+      // Move midprice down proportional to signal
+      if (signal < -0.5) {
+        // Cancel all open orders
+        for (const auto& x : state.open_orders) {
+          place_cancel(com, Common::Cancel{
+            .ticker = 0,
+            .order_id = x.first,
+            .trader_id = trader_id
+          });
+        }
+
+        // Make new market
+        new_bid = mid_price + signalToCents;
+        new_offer = mid_price + signalToCents;
+        bid_volume = available_position/2.0;
+        offer_volume = available_position/2.0;
+
+        place_order(com, Common::Order{
+          .ticker = 0,
+          .price = new_bid,
+          .quantity = bid_volume,
+          .buy = true,
+          .ioc = false,
+          .order_id = 0, // this order ID will be chosen randomly by com
+          .trader_id = trader_id
+        });
+        place_order(com, Common::Order{
+          .ticker = 0,
+          .price = new_offer,
+          .quantity = offer_volume,
+          .buy = false,
+          .ioc = false,
+          .order_id = 0, // this order ID will be chosen randomly by com
+          .trader_id = trader_id
+        });
+      }
+    } 
   }
 
   // EDIT THIS METHOD
