@@ -522,7 +522,7 @@ public:
 
   // (maybe) EDIT THIS METHOD
   void on_packet_end(Bot::Communicator& com) {
-      std::cout << "Packet End"
+      std::cout << "Packet End";
     if (trade_with_me_in_this_packet) {
 
       price_t pnl = state.get_pnl();
@@ -557,6 +557,7 @@ public:
 
 
 int main(int argc, const char ** argv) {
+  std::cout << "in main";
 
 
   std::string prefix = "comp"; // DO NOT CHANGE THIS
