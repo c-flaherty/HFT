@@ -364,6 +364,7 @@ public:
 
   }
   int64_t last = 0, start_time;
+  int64_t cycle = 0;
 
   bool trade_with_me_in_this_packet = false;
 
@@ -372,6 +373,7 @@ public:
     state.trader_id = trader_id;
     // state.log_path = "book.log";
     start_time = time_ns();
+    cycle = time_ns();
   }
 
 
@@ -396,6 +398,15 @@ public:
     //  return;
     //}
     last = now;
+
+    if (now - cycle > 1000) {
+      cycle = now;
+      std::cout << "Current PNL: " 
+                << state.get_pnl()
+                << "PNL/Second: "
+                << std::setw(15) << std::left << (state.get_pnl()/((time_ns() - start_time)/1e9));
+    }
+
 
     // a way to cancel all your open orders
     //for (const auto& x : state.open_orders) {
@@ -522,11 +533,11 @@ public:
 
   // (maybe) EDIT THIS METHOD
   void on_packet_end(Bot::Communicator& com) {
-      std::cout << "Packet End";
     if (trade_with_me_in_this_packet) {
 
       price_t pnl = state.get_pnl();
 
+      /*
       std::cout << "got trade with me; pnl = "
                 << std::setw(15) << std::left << pnl
                 << " ; position = "
@@ -537,6 +548,7 @@ public:
                 << std::setw(15) << std::left << (state.volume_traded ? pnl/state.volume_traded : 0.0)
                 << std::endl;
     }
+    */
   }
 
   order_id_t place_order(Bot::Communicator& com, const Common::Order& order) {
@@ -557,7 +569,7 @@ public:
 
 
 int main(int argc, const char ** argv) {
-  std::cout << "in main";
+  std::cout << "Bot Started";
 
 
   std::string prefix = "comp"; // DO NOT CHANGE THIS
