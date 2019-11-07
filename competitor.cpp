@@ -267,7 +267,7 @@ struct MyState {
     last_trade_price = update.price;
 
     books[update.ticker].decrease_qty(update.resting_order_id, update.quantity);
-    books[update.ticker].print_book(log_path, open_orders);
+    // books[update.ticker].print_book(log_path, open_orders);
 
     if (submitted.count(update.resting_order_id)) {
 
@@ -309,7 +309,7 @@ struct MyState {
     };
 
     books[update.ticker].insert(order);
-    books[update.ticker].print_book(log_path, open_orders);
+    // books[update.ticker].print_book(log_path, open_orders);
 
     if (submitted.count(update.order_id)) {
       open_orders[update.order_id] = order;
@@ -318,7 +318,7 @@ struct MyState {
 
   void on_cancel_update(const Common::CancelUpdate& update) {
     books[update.ticker].cancel(trader_id, update.order_id);
-    books[update.ticker].print_book(log_path, open_orders);
+    // books[update.ticker].print_book(log_path, open_orders);
 
     if (open_orders.count(update.order_id)) {
       open_orders.erase(update.order_id);
@@ -466,6 +466,8 @@ public:
 
     if (now - cycle > 1e8) {
       cycle = now;
+
+      books[0].print_book(state.log_path, state.open_orders);
 
       /*
       if (position > 20) {
