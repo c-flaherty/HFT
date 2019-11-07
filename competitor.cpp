@@ -105,7 +105,10 @@ public:
     quantity_t bid_volume = 0;
     std::set<LimitOrder>::iterator bid_level=sides[1].begin();
     for (int i = 0; i<num_levels && bid_level!=sides[1].end(); i++) {
-      if (i == 0 && bid_level -> quantity >= 1000) continue; 
+      if (i == 0 && bid_level -> quantity >= 1000) {
+        bid_level++;
+        continue; 
+      }
       weight = 1 - abs(best_bid - bid_level->price)/best_bid;
       bid_volume += weight * (bid_level->quantity);
       bid_level++;
@@ -115,7 +118,10 @@ public:
     quantity_t ask_volume = 0;
     std::set<LimitOrder>::iterator ask_level=sides[0].begin();
     for (int i = 0; i<num_levels && ask_level!=sides[0].end(); i++) {
-      if (i == 0 && bid_level -> quantity >= 1000) continue; 
+      if (i == 0 && ask_level -> quantity >= 1000) {
+        ask_level++;
+        continue; 
+      }
       weight = 1 - abs(ask_level->price - best_offer)/best_offer;
       ask_volume += weight * (ask_level->quantity);
       ask_level++;
@@ -600,7 +606,6 @@ public:
     }
 
     /* --------------- MAKER - MAKER STRATEGY START------------------- */
-    /*
     signal_difference = abs(avg_signal - previous_avg_signal);
     if (signal_difference == 0) {
       return;
@@ -675,7 +680,6 @@ public:
         });
       }
     } 
-    */
     
     previous_signal = signal;
     previous_avg_signal = avg_signal;
