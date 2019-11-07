@@ -405,6 +405,13 @@ public:
                 << state.get_pnl()
                 << "PNL/Second: "
                 << std::setw(15) << std::left << (state.get_pnl()/((time_ns() - start_time)/1e9));
+
+      std::cout << "Best bid: " 
+                << state.get_bbo(0, true)
+                << "\n"
+                << "Best offer: "
+                << state.get_bbo(0, false)
+                << "\n";
     }
 
 
@@ -429,8 +436,6 @@ public:
     quantity_t position = state.positions[0];
     double available_position = 2000 - position;
     quantity_t bid_volume, offer_volume;
-
-    std::cout << "Signal: " << signal;
 
     if (signal == 0) {
       return;
