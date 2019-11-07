@@ -195,7 +195,10 @@ public:
       return;
     }
 
-    std::ofstream fout(fp);
+    std::ofstream fout(fp, std::fstream::app);
+
+    fout << " -- Next Time Step -- \n";
+    fout << "Signal: " << get_signal(8) << "\n";
 
     fout << "offers\n";
     for (auto rit = sides[0].rbegin(); rit != sides[0].rend(); rit++) {
@@ -426,11 +429,11 @@ public:
     state.log_path = "book.log";
 
     // Query User for input
-    std::cout << "Please input the number of levels you want to use for signal (Suggested: 8): ";
+    std::cout << "Please input the number of levels you want to use for signal (Suggested: 8 or 25): ";
     std::cin >> num_levels_for_signal;
-    std::cout << "\nPlease input your market volume (Suggested: 20):  ";
+    std::cout << "\nPlease input your market volume (Suggested: 20 or 20):  ";
     std::cin >> mkt_volume;
-    std::cout << "\nPlease input signal difference needed to update market (Suggested: 0.1): ";
+    std::cout << "\nPlease input signal difference needed to update market (Suggested: 0.1 or 0.2): ";
     std::cin >> meaningful_signal_diff;
     std::cout << "\n";
 
@@ -483,6 +486,7 @@ public:
     if (now - cycle > 1e8) {
       cycle = now;
 
+      std::cout << "Logging";
       state.books[0].print_book(state.log_path, state.open_orders);
 
       /*
