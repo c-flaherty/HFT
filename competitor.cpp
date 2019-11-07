@@ -565,7 +565,7 @@ public:
         });
       place_order(com, Common::Order{
           .ticker = 0,
-          .price = mid_price,
+          .price = best_offer,
           .quantity = std::min((2000-position)/2, ask_quote),
           .buy = true,
           .ioc = false,
@@ -576,7 +576,7 @@ public:
     } else if (bid_quote - ask_quote > 600) {
       place_order(com, Common::Order{
           .ticker = 0,
-          .price = mid_price,
+          .price = best_bid,
           .quantity = std::min((2000-position)/2, bid_quote),
           .buy = false,
           .ioc = false,
