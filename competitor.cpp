@@ -469,7 +469,7 @@ public:
         place_order(com, Common::Order{
           .ticker = 0,
           .price = best_offer - 0.01,
-          .quantity = 50,
+          .quantity = available_position/2.0,
           .buy = true,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -478,7 +478,7 @@ public:
         place_order(com, Common::Order{
           .ticker = 0,
           .price = best_offer + spread,
-          .quantity = 50,
+          .quantity = available_position/2.0,
           .buy = false,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -506,7 +506,7 @@ public:
         place_order(com, Common::Order{
           .ticker = 0,
           .price = best_bid - spread,
-          .quantity = 50,
+          .quantity = available_position/2.0,
           .buy = true,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -515,7 +515,7 @@ public:
         place_order(com, Common::Order{
           .ticker = 0,
           .price = best_bid + 0.01,
-          .quantity = 50,
+          .quantity = available_position/2.0,
           .buy = false,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
