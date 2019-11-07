@@ -436,57 +436,7 @@ public:
     int64_t now = time_ns();
     last = now;
 
-    if (now - cycle > 1e9) {
-      cycle = now;
-      std::cout << "Current PNL: " 
-                << state.get_pnl()
-                << "\nPNL/Second: "
-                << std::setw(15) << std::left << (state.get_pnl()/((time_ns() - start_time)/1e9))
-                << "\n"
-                << "Current Position: "
-                << state.positions[0]
-                << "\n"
-                << "Current Cash: "
-                << state.cash
-                << "\n\n";
-
-      std::cout << "Best offer: "
-                << state.get_bbo(0, false)
-                << "\n"
-                << "Best bid: " 
-                << state.get_bbo(0, true)
-                << "\n"
-                << "Current spread: "
-                << state.get_spread(0)
-                << "\n"
-                << "Signal: "
-                << state.get_signal(0)
-                << "\n\n";
-
-      if (state.positions[0] > 500) {
-        place_order(com, Common::Order{
-          .ticker = 0,
-          .price = state.get_bbo(0, true)-0.01,
-          .quantity = state.positions[0],
-          .buy = false,
-          .ioc = true,
-          .order_id = 0, // this order ID will be chosen randomly by com
-          .trader_id = trader_id
-        });
-        return;
-      } else if (state.positions[0] < -500) {
-        place_order(com, Common::Order{
-          .ticker = 0,
-          .price = state.get_bbo(0, false)+0.01,
-          .quantity = abs(state.positions[0]),
-          .buy = true,
-          .ioc = true,
-          .order_id = 0, // this order ID will be chosen randomly by com
-          .trader_id = trader_id
-        });
-        return;
-      }
-
+    if (now - cycle > 1e8) {
       /* -------------- DIRECTIONAL STRATEGY --------------- */
 
       // Exit previous bet
@@ -538,6 +488,58 @@ public:
       }
 
       cumulative_signal_over_second = 0;
+    }
+
+    if (now - cycle > 1e9) {
+      cycle = now;
+      std::cout << "Current PNL: " 
+                << state.get_pnl()
+                << "\nPNL/Second: "
+                << std::setw(15) << std::left << (state.get_pnl()/((time_ns() - start_time)/1e9))
+                << "\n"
+                << "Current Position: "
+                << state.positions[0]
+                << "\n"
+                << "Current Cash: "
+                << state.cash
+                << "\n\n";
+
+      std::cout << "Best offer: "
+                << state.get_bbo(0, false)
+                << "\n"
+                << "Best bid: " 
+                << state.get_bbo(0, true)
+                << "\n"
+                << "Current spread: "
+                << state.get_spread(0)
+                << "\n"
+                << "Signal: "
+                << state.get_signal(0)
+                << "\n\n";
+
+      if (state.positions[0] > 500) {
+        place_order(com, Common::Order{
+          .ticker = 0,
+          .price = state.get_bbo(0, true)-0.01,
+          .quantity = state.positions[0],
+          .buy = false,
+          .ioc = true,
+          .order_id = 0, // this order ID will be chosen randomly by com
+          .trader_id = trader_id
+        });
+        return;
+      } else if (state.positions[0] < -500) {
+        place_order(com, Common::Order{
+          .ticker = 0,
+          .price = state.get_bbo(0, false)+0.01,
+          .quantity = abs(state.positions[0]),
+          .buy = true,
+          .ioc = true,
+          .order_id = 0, // this order ID will be chosen randomly by com
+          .trader_id = trader_id
+        });
+        return;
+      }
     }
 
     /* --------------- MAKER - MAKER STRATEGY ------------------- */
