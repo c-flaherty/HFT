@@ -559,7 +559,7 @@ public:
           .price = best_offer-0.01,
           .quantity = 200,
           .buy = false,
-          .ioc = false,
+          .ioc = true,
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
         });
@@ -568,7 +568,7 @@ public:
           .price = best_bid,
           .quantity = 200,
           .buy = true,
-          .ioc = false,
+          .ioc = true,
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
         });
@@ -579,7 +579,7 @@ public:
           .price = best_offer,
           .quantity = 200,
           .buy = false,
-          .ioc = false,
+          .ioc = true,
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
         });
@@ -588,7 +588,7 @@ public:
           .price = best_bid+0.01,
           .quantity = 200,
           .buy = true,
-          .ioc = false,
+          .ioc = true,
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
         });
