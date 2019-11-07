@@ -405,7 +405,7 @@ public:
                 << state.get_pnl()
                 << "\nPNL/Second: "
                 << std::setw(15) << std::left << (state.get_pnl()/((time_ns() - start_time)/1e9))
-                << "\n";
+                << "\n\n";
 
       std::cout << "Best bid: " 
                 << state.get_bbo(0, true)
@@ -418,7 +418,7 @@ public:
                 << "\n"
                 << "Signal: "
                 << state.get_signal(0)
-                << "\n";
+                << "\n\n";
     }
 
 
