@@ -511,10 +511,10 @@ public:
       */
     }
 
-    if (position > 200) {
+    if (position > 40) {
       bid_volume = mkt_volume;
       ask_volume = mkt_volume + 0.5 * position;
-    } else if (position < -200) {
+    } else if (position < -40) {
       bid_volume = mkt_volume + 0.5 * abs(position);
       ask_volume = mkt_volume;
     } else {
