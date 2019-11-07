@@ -199,6 +199,9 @@ public:
 
     fout << " -- Next Time Step -- \n";
     fout << "Signal: " << get_signal(8) << "\n";
+    fout << "Spread: " << spread() << "\n";
+    fout << "Buy Quote Size: " << quote_size(true) << "\n";
+    fout << "Sell Quoate Size: " << quote_size(false) << "\n";
 
     fout << "offers\n";
     for (auto rit = sides[0].rbegin(); rit != sides[0].rend(); rit++) {
@@ -484,7 +487,7 @@ public:
     }
 
     state.books[0].print_book(state.log_path, state.open_orders);
-    
+
     if (now - cycle > 1e8) {
       cycle = now;
 
