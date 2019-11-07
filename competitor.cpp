@@ -368,6 +368,7 @@ public:
   int64_t cycle = 0;
   double previous_signal = 0;
   double cumulative_signal_over_second = 0;
+  int num_signals = 0;
   int previous_directional_bet_is_bid = -1; // 1 is bet, 0 is ask, -1 is undefined
 
   bool trade_with_me_in_this_packet = false;
@@ -426,6 +427,7 @@ public:
     double spread = state.get_spread(0);
     double signal = state.get_signal(0);
     cumulative_signal_over_second += signal;
+    num_signals += 1;
     double signalToCents = signal/10.0;
     double newSpread = spread + signalToCents;
     double new_bid, new_offer;
@@ -436,7 +438,7 @@ public:
     int64_t now = time_ns();
     last = now;
 
-    if (now - cycle > 1e8) {
+    if (now - cycle > 5e8) {
       /* -------------- DIRECTIONAL STRATEGY --------------- */
 
       // Exit previous bet
@@ -463,7 +465,7 @@ public:
       }
 
       // Enter new bet
-      if (cumulative_signal_over_second > 0) {
+      if (cumulative_signal_over_second/num_signals > 0.25) {
         previous_directional_bet_is_bid = 1;
         place_order(com, Common::Order{
           .ticker = 0,
@@ -474,7 +476,7 @@ public:
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
         });
-      } else if (cumulative_signal_over_second < 0) {
+      } else if (cumulative_signal_over_second/num_signals < 0.25) {
         previous_directional_bet_is_bid = 0;
         place_order(com, Common::Order{
           .ticker = 0,
@@ -488,6 +490,7 @@ public:
       }
 
       cumulative_signal_over_second = 0;
+      num_signals = 0;
     }
 
     if (now - cycle > 1e9) {
