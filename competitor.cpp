@@ -566,7 +566,7 @@ public:
       place_order(com, Common::Order{
           .ticker = 0,
           .price = best_offer,
-          .quantity = 200, ask_quote),
+          .quantity = 200,
           .buy = true,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
