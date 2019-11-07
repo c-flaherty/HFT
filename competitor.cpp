@@ -397,13 +397,15 @@ public:
             << state.get_signal(0)
             << "\n\n";
     std::cout << "Starting PNL: " 
-                << state.get_pnl()
-                << "\nStarting PNL/Second: "
-                << std::setw(15) << std::left << (state.get_pnl()/((time_ns() - start_time)/1e9))
-                << "\n"
-                << "Starting Position: "
-                << state.positions[0]
-                << "\n\n";
+            << state.get_pnl()
+            << "\nStarting PNL/Second: "
+            << std::setw(15) << std::left << (state.get_pnl()/((time_ns() - start_time)/1e9))
+            << "\n"
+            << "Starting Position: "
+            << state.positions[0]
+            << "Starting Cash: "
+            << state.cash
+            << "\n\n";
   }
 
 
@@ -553,7 +555,7 @@ public:
       } else if (state.positions[0] < -20) {
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = state.get_bbo(0, false),
+          .price = state.get_bbo(0, false)+0.05,
           .quantity = abs(state.positions[0]),
           .buy = true,
           .ioc = true,
