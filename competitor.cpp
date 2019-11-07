@@ -438,7 +438,7 @@ public:
     int64_t now = time_ns();
     last = now;
 
-    if (now - cycle > 5e8) {
+    if (num_signals > 5) {
       /* -------------- DIRECTIONAL STRATEGY --------------- */
 
       // Exit previous bet
@@ -465,7 +465,7 @@ public:
       }
 
       // Enter new bet
-      if (cumulative_signal_over_second/num_signals > 0.25) {
+      if (signal > 0.25) {
         previous_directional_bet_is_bid = 1;
         place_order(com, Common::Order{
           .ticker = 0,
@@ -476,7 +476,7 @@ public:
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
         });
-      } else if (cumulative_signal_over_second/num_signals < 0.25) {
+      } else if (signal < 0.25) {
         previous_directional_bet_is_bid = 0;
         place_order(com, Common::Order{
           .ticker = 0,
