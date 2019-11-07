@@ -126,6 +126,14 @@ public:
     return signal;
   }
 
+  int get_quote_vol(bool buy) {
+    quantity_t vol = 0;
+    for (std::set<LimitOrder>::iterator level=sides[buy].begin(); level!=sides[buy].end(); ++level) {
+      vol += level->quantity;
+    }
+    return vol;
+  }
+
   int num_levels(bool buy) {
     int count = 0;
     for (std::set<LimitOrder>::iterator level = sides[buy].begin(); level!=sides[buy].end(); level++)
@@ -200,8 +208,12 @@ public:
     fout << " -- Next Time Step -- \n";
     fout << "Signal: " << get_signal(8) << "\n";
     fout << "Spread: " << spread() << "\n";
+    fout << "Sell Quote Size: " << quote_size(false) << "\n";
+    fout << "Sell Vol: " << get_quote_vol(false) << "\n";
     fout << "Buy Quote Size: " << quote_size(true) << "\n";
-    fout << "Sell Quoate Size: " << quote_size(false) << "\n";
+    fout << "Buy Vol: " << get_quote_vol(true) << "\n";
+    fout << "Midpoint: " << get_mid_price(0) << "\n";
+
 
     fout << "offers\n";
     for (auto rit = sides[0].rbegin(); rit != sides[0].rend(); rit++) {
