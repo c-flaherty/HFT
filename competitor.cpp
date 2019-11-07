@@ -78,6 +78,7 @@ public:
     }
 
     // Calculate bid volume for all levels
+    /*
     quantity_t bid_volume = 0;
     for (auto& x : sides[bid]) {
       if (x.price > best_bid) {
@@ -85,8 +86,10 @@ public:
       }
       bid_volume += x.quantity;
     }
+    */
 
     // Calculate  ask volume for all levels
+    /*
     quantity_t ask_volume = 0;
     for (auto& x : sides[ask]) {
       if (x.price < best_offer) {
@@ -94,6 +97,21 @@ public:
       }
       ask_volume += x.quantity;
     }
+    */
+
+    int levels = 8;
+    // Calculate bid volume for up to 8 levels
+    quantity_t bid_volume = 0;
+    std::set<LimitOrder>::iterator bid_level=sides[1].begin();
+    for (int i = 0; i<8 && bid_level!=sides[1].end(); i++) 
+      bid_volume += bid_level->quantity;
+
+    // Calculate ask volume for up to 8 levels
+    quantity_t ask_volume = 0;
+    std::set<LimitOrder>::iterator ask_level=sides[0].begin();
+    for (int i = 0; i<8 && ask_level!=sides[1].end(); i++) 
+      ask_volume += ask_level->quantity;
+      
 
     // Calculate signal
     signal = ((double)bid_volume - (double)ask_volume)/((double)bid_volume + (double)ask_volume);
