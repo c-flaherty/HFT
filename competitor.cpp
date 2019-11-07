@@ -530,7 +530,7 @@ public:
       if (state.positions[0] > 40) {
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = state.get_bbo(0, true)-0.01,
+          .price = state.get_bbo(0, true)-0.05,
           .quantity = state.positions[0],
           .buy = false,
           .ioc = true,
@@ -541,7 +541,7 @@ public:
       } else if (state.positions[0] < -40) {
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = state.get_bbo(0, false)+0.01,
+          .price = state.get_bbo(0, false)+0.05,
           .quantity = abs(state.positions[0]),
           .buy = true,
           .ioc = true,
