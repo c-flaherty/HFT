@@ -460,6 +460,10 @@ public:
           });
         }
 
+        if (spread < 0.05) {
+          return;
+        }
+
         // Make new market
         new_bid = mid_price + signalToCents;
         new_offer = mid_price + signalToCents;
@@ -495,6 +499,10 @@ public:
             .order_id = x.first,
             .trader_id = trader_id
           });
+        }
+
+        if (spread < 0.05) {
+          return;
         }
 
         // Make new market
