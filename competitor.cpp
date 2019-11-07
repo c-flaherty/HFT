@@ -432,6 +432,9 @@ public:
                 << "\n"
                 << "Current Position: "
                 << state.positions[0]
+                << "\n"
+                << "Current Cash: "
+                << state.cash
                 << "\n\n";
 
       std::cout << "Best offer: "
@@ -469,7 +472,7 @@ public:
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
         });
-      }
+      }      
     }
 
 
@@ -522,7 +525,7 @@ public:
         place_order(com, Common::Order{
           .ticker = 0,
           .price = best_offer - 0.01,
-          .quantity = std::min(available_position, 20.0),
+          .quantity = std::min(available_position, 200.0),
           .buy = true,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -531,7 +534,7 @@ public:
         place_order(com, Common::Order{
           .ticker = 0,
           .price = best_offer + spread * (signal),
-          .quantity = std::min(available_position, 20.0),
+          .quantity = std::min(available_position, 200.0),
           .buy = false,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -563,7 +566,7 @@ public:
         place_order(com, Common::Order{
           .ticker = 0,
           .price = best_bid + spread * (signal),
-          .quantity = std::min(available_position, 20.0),
+          .quantity = std::min(available_position, 200.0),
           .buy = true,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -572,7 +575,7 @@ public:
         place_order(com, Common::Order{
           .ticker = 0,
           .price = best_bid + 0.01,
-          .quantity = std::min(available_position, 20.0),
+          .quantity = std::min(available_position, 200.0),
           .buy = false,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
