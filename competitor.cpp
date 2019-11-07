@@ -366,6 +366,9 @@ public:
   }
   int64_t last = 0, start_time;
   int64_t cycle = 0;
+  double sum_diff_in_spread = 0;
+  double num_updates = 0;
+  double previous_spread = 0;
   double previous_signal = 0;
   double cumulative_signal_over_second = 0;
   int num_signals = 0;
@@ -425,6 +428,11 @@ public:
     double best_offer = state.get_bbo(0, false);
     double mid_price = state.get_mid_price(0);
     double spread = state.get_spread(0);
+    if (previous_spread != 0) {
+      sum_diff_in_spread += abs(spread - previous_spread);
+    }
+    previous_spread = spread;
+
     double signal = state.get_signal(0);
     double signalToCents = signal/10.0;
     double newSpread = spread + signalToCents;
@@ -432,6 +440,7 @@ public:
     quantity_t position = state.positions[0];
     double available_position = 2000 - position;
     quantity_t bid_volume, offer_volume;
+    num_updates += 1;
 
     int64_t now = time_ns();
     last = now;
@@ -525,9 +534,11 @@ public:
                 << "\n"
                 << "Signal: "
                 << state.get_signal(0)
+                << "Average Difference in Spread: "
+                << sum_diff_in_spread/num_updates
                 << "\n\n";
 
-      if (state.positions[0] > 40) {
+      if (state.positions[0] > 500) {
         place_order(com, Common::Order{
           .ticker = 0,
           .price = state.get_bbo(0, true)-0.05,
@@ -538,10 +549,10 @@ public:
           .trader_id = trader_id
         });
         return;
-      } else if (state.positions[0] < -40) {
+      } else if (state.positions[0] < -500) {
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = state.get_bbo(0, false)+0.05,
+          .price = state.get_bbo(0, false),
           .quantity = abs(state.positions[0]),
           .buy = true,
           .ioc = true,
