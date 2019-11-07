@@ -540,6 +540,9 @@ public:
     }
     bid_quote = state.books[0].quote_size(true);
     ask_quote = state.books[0].quote_size(false);
+
+    std::cout << "Bid Quote: " << bid_quote << "\n";
+    std::cout << "Ask Quote: " << ask_quote << "\n\n";
     
     if (ask_quote > 3000) {
       place_order(com, Common::Order{
