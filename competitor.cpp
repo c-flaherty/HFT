@@ -529,7 +529,7 @@ public:
 
     /* --------------- MAKER - MAKER STRATEGY START------------------- */
     signal_difference = abs(avg_signal - previous_avg_signal);
-    if (signal_difference == 0) {
+    if (avg_signal == 0) {
       return;
     } else if (avg_signal > 0) {
       // Move midprice up proportional to signal
