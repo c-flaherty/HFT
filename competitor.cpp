@@ -411,6 +411,12 @@ public:
   int num_levels_for_signal;
   quantity_t mkt_volume;
   double meaningful_signal_diff;
+  
+  quantity_t bid_volume, ask_volume, position;
+  double best_bid, best_offer, signal_difference, mid_price, spread, signal;
+
+  int64_t now;
+
 
   // (maybe) EDIT THIS METHOD
   void init(Bot::Communicator& com) {
@@ -446,17 +452,16 @@ public:
   void on_order_update(Common::OrderUpdate & update, Bot::Communicator& com){
     state.on_order_update(update);
 
-    double best_bid = state.get_bbo(0, true);
-    double best_offer = state.get_bbo(0, false);
-    double mid_price = 0.5 * (best_bid + best_offer);
-    double spread = best_offer - best_bid;
+    best_bid = state.get_bbo(0, true);
+    best_offer = state.get_bbo(0, false);
+    mid_price = 0.5 * (best_bid + best_offer);
+    spread = best_offer - best_bid;
 
-    double signal = state.get_signal(0, num_levels_for_signal);
-    quantity_t position = state.positions[0];
-    quantity_t bid_volume, offer_volume;
+    signal = state.get_signal(0, num_levels_for_signal);
+    position = state.positions[0];
     num_updates += 1;
 
-    int64_t now = time_ns();
+    now = time_ns();
     last = now;
 
     if (now - cycle > 1e8) {
@@ -489,8 +494,16 @@ public:
       */
     }
 
+    if (position > 0) {
+      bid_volume = mkt_volume;
+      ask_volume = mkt_volume + 0.5 * position;
+    } else {
+      bid_volume = mkt_volume + 0.5 * abs(position);
+      ask_volume = mkt_volume;
+    }
+
     /* --------------- MAKER - MAKER STRATEGY START------------------- */
-    double signal_difference = abs(previous_signal - signal);
+    signal_difference = abs(previous_signal - signal);
     if (signal_difference == 0) {
       return;
     } else if (signal > 0) {
@@ -509,7 +522,7 @@ public:
         place_order(com, Common::Order{
           .ticker = 0,
           .price = best_offer,
-          .quantity = mkt_volume,
+          .quantity = bid_volume,
           .buy = true,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -518,7 +531,7 @@ public:
         place_order(com, Common::Order{
           .ticker = 0,
           .price = std::max(best_offer + 0.01, best_offer + spread * (signal)),
-          .quantity = mkt_volume,
+          .quantity = ask_volume,
           .buy = false,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -541,7 +554,7 @@ public:
         place_order(com, Common::Order{
           .ticker = 0,
           .price = std::min(best_bid - 0.1, best_bid + spread * (signal)),
-          .quantity = mkt_volume,
+          .quantity = bid_volume,
           .buy = true,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -550,7 +563,7 @@ public:
         place_order(com, Common::Order{
           .ticker = 0,
           .price = best_bid,
-          .quantity = mkt_volume,
+          .quantity = ask_volume,
           .buy = false,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
