@@ -552,7 +552,7 @@ public:
     std::cout << "Get Second Ask Price: " << state.books[0].get_second_price(false) << "\n\n";
 
     
-    if (ask_quote > 3000) {
+    if (ask_quote - bid_quote > 600) {
       place_order(com, Common::Order{
           .ticker = 0,
           .price = best_offer - 0.01,
@@ -572,7 +572,7 @@ public:
           .trader_id = trader_id
         });
       return;
-    } else if (bid_quote > 3000) {
+    } else if (bid_quote - ask_quote > 600) {
       place_order(com, Common::Order{
           .ticker = 0,
           .price = best_offer,
