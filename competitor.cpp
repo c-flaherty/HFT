@@ -138,8 +138,8 @@ public:
 
   price_t get_second_price(bool buy) {
     std::set<LimitOrder>::iterator level=sides[buy].begin();
-    level++;
-    return level->price;
+    price_t price = level->price;
+    return price;
   }
 
   int num_levels(bool buy) {
