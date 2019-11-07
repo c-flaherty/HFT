@@ -447,12 +447,24 @@ public:
                 << state.get_signal(0)
                 << "\n\n";
 
-      if (state.positions[0] > 1000) {
+      if (state.positions[0] > 500) {
         place_order(com, Common::Order{
           .ticker = 0,
           .price = state.get_bbo(0, true)-0.01,
           .quantity = state.positions[0],
           .buy = false,
+          .ioc = true,
+          .order_id = 0, // this order ID will be chosen randomly by com
+          .trader_id = trader_id
+        });
+      }
+
+      if (state.positions[0] < -500) {
+        place_order(com, Common::Order{
+          .ticker = 0,
+          .price = state.get_bbo(0, false)+0.01,
+          .quantity = abs(state.positions[0]),
+          .buy = true,
           .ioc = true,
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
