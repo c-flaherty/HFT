@@ -556,38 +556,38 @@ public:
     if (ask_quote - bid_quote > 5000) {
       place_order(com, Common::Order{
           .ticker = 0,
-          .price = best_offer-0.01,
-          .quantity = (2000-position)/2,
+          .price = state.books[0].get_second_price(false)-0.01,
+          .quantity = 200,
           .buy = false,
-          .ioc = true,
+          .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
         });
       place_order(com, Common::Order{
           .ticker = 0,
-          .price = best_bid,
-          .quantity = (2000-position)/2,
+          .price = best_offer,
+          .quantity = 200,
           .buy = true,
-          .ioc = true,
+          .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
         });
     } else if (bid_quote - ask_quote > 5000) {
       place_order(com, Common::Order{
           .ticker = 0,
-          .price = best_offer,
-          .quantity = (2000-position)/2,
+          .price = best_bid,
+          .quantity = 200,
           .buy = false,
-          .ioc = true,
+          .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
         });
       place_order(com, Common::Order{
           .ticker = 0,
-          .price = best_bid+0.01,
-          .quantity = (2000-position)/2,
+          .price = state.books[0].get_second_price(true)+0.01,
+          .quantity = 200,
           .buy = true,
-          .ioc = true,
+          .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
         });
@@ -605,6 +605,7 @@ public:
     }
 
     /* --------------- MAKER - MAKER STRATEGY START------------------- */
+    /*
     signal_difference = abs(avg_signal - previous_avg_signal);
     if (signal_difference == 0) {
       return;
@@ -613,7 +614,7 @@ public:
       if (abs(signal) > meaningful_signal_diff) {
         // Cancel all open orders
 
-        /*
+        
         for (const auto& x : state.open_orders) {
           if (true || (x.second.buy && x.second.price < best_bid)) {
             place_cancel(com, Common::Cancel{
@@ -622,7 +623,7 @@ public:
               .trader_id = trader_id
             });
           }
-        }*/
+        }
 
         // Make new market
         place_order(com, Common::Order{
@@ -649,7 +650,7 @@ public:
       if (abs(signal) > meaningful_signal_diff) {
         // Cancel all open orders
 
-        /*
+        
         for (const auto& x : state.open_orders) {
           if (true || (!x.second.buy && x.second.price > best_offer)) {
             place_cancel(com, Common::Cancel{
@@ -658,7 +659,7 @@ public:
               .trader_id = trader_id
             });
           }
-        }*/
+        }
 
         // Make new market
         place_order(com, Common::Order{
@@ -680,6 +681,7 @@ public:
           .trader_id = trader_id
         });
       }
+      */
     } 
     previous_signal = signal;
     previous_avg_signal = avg_signal;
