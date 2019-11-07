@@ -111,7 +111,7 @@ public:
     // Calculate ask volume for up to 8 levels
     quantity_t ask_volume = 0;
     std::set<LimitOrder>::iterator ask_level=sides[0].begin();
-    for (int i = 0; i<8 && ask_level!=sides[1].end(); i++) {
+    for (int i = 0; i<8 && ask_level!=sides[0].end(); i++) {
       ask_volume += ask_level->quantity;
       ask_level++;
     }
@@ -123,10 +123,11 @@ public:
     return signal;
   }
 
-  //int num_levels(bool buy) {
-  //  int count = 0
-  //}
-
+  int num_levels(bool buy) {
+    int count = 0;
+    for (std::set<LimitOrder>::iterator level = sides[buy].begin(); level!=sides[buy].end(); level++)
+      count+=1;
+  }
 
   void insert(Common::Order order_to_insert) {
 
@@ -536,6 +537,11 @@ public:
 
     if (now - cycle > 1e9) {
       cycle = now;
+      std::cout << "Num Bid Levels: "
+                << state.books[0].get_levels(1)
+                << "\nNum Ask Levels: "
+                << state.books[0].get_levels(0)
+                << "\n\n";
       /*
       std::cout << "Current PNL: " 
                 << state.get_pnl()
