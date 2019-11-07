@@ -555,6 +555,14 @@ public:
     */
     
     if (ask_quote - bid_quote > 5000) {
+      for (const auto& x : state.open_orders) {
+        place_cancel(com, Common::Cancel{
+          .ticker = 0,
+          .order_id = x.first,
+          .trader_id = trader_id
+        });
+      }
+
       place_order(com, Common::Order{
           .ticker = 0,
           .price = state.books[0].get_second_price(false)-0.01,
@@ -575,6 +583,14 @@ public:
         });
         return;
     } else if (bid_quote - ask_quote > 5000) {
+      for (const auto& x : state.open_orders) {
+        place_cancel(com, Common::Cancel{
+          .ticker = 0,
+          .order_id = x.first,
+          .trader_id = trader_id
+        });
+      }
+      
       place_order(com, Common::Order{
           .ticker = 0,
           .price = best_bid,
