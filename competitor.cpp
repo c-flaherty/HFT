@@ -549,6 +549,7 @@ public:
 
     std::cout << "Bid Quote: " << bid_quote << "\n";
     std::cout << "Ask Quote: " << ask_quote << "\n";
+    std::cout << "Mid Price: " << mid_price << "\n";
     std::cout << "Get Second Ask Price: " << state.books[0].get_second_price(false) << "\n\n";
 
     
