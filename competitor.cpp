@@ -462,6 +462,7 @@ public:
     if (now - cycle > 1e8) {
       cycle = now;
 
+      /*
       if (position > 20) {
         place_order(com, Common::Order{
           .ticker = 0,
@@ -485,6 +486,7 @@ public:
         });
         return;
       }
+      */
     }
 
     /* --------------- MAKER - MAKER STRATEGY START------------------- */
