@@ -499,6 +499,7 @@ public:
     now = time_ns();
     last = now;
 
+    /*
     if (t_minus_one_signal == 2) {
       t_minus_one_signal = signal;
       return;
@@ -515,6 +516,7 @@ public:
 
     state.books[0].print_book(state.log_path, state.open_orders);
 
+    */
     if (now - cycle > 1e8) {
       cycle = now;
 
@@ -590,7 +592,7 @@ public:
           .trader_id = trader_id
         });
       }
-      
+
       place_order(com, Common::Order{
           .ticker = 0,
           .price = best_bid,
@@ -612,6 +614,7 @@ public:
         return;
     }
 
+    /*
     if (position > 240) {
       bid_volume = mkt_volume;
       ask_volume = mkt_volume + 0.5 * position;
@@ -622,6 +625,7 @@ public:
       bid_volume = mkt_volume;
       ask_volume = mkt_volume;
     }
+    */
 
     /* --------------- MAKER - MAKER STRATEGY START------------------- */
     /*
@@ -702,8 +706,8 @@ public:
       }
       
     } */
-    previous_signal = signal;
-    previous_avg_signal = avg_signal;
+    // previous_signal = signal;
+    // previous_avg_signal = avg_signal;
    /* --------------- MAKER - MAKER STRATEGY END------------------- */
   }
 
