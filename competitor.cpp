@@ -399,7 +399,7 @@ public:
     //}
     last = now;
 
-    if (now - cycle > 1e9) {
+    if (now - cycle > 1e8) {
       cycle = now;
       std::cout << "Current PNL: " 
                 << state.get_pnl()
@@ -429,6 +429,8 @@ public:
     quantity_t position = state.positions[0];
     double available_position = 2000 - position;
     quantity_t bid_volume, offer_volume;
+
+    std::cout << "Signal: " << signal;
 
     if (signal == 0) {
       return;
