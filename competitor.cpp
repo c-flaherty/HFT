@@ -100,19 +100,19 @@ public:
     */
 
     double weight;
-    // Calculate bid volume for up to 8 levels
+    // Calculate bid volume for up to all levels
     quantity_t bid_volume = 0;
     std::set<LimitOrder>::iterator bid_level=sides[1].begin();
-    for (int i = 0; i<num_levels && bid_level!=sides[1].end(); i++) {
+    for (int i = 0; /*i<num_levels && */bid_level!=sides[1].end(); i++) {
       weight = 1 - abs(best_bid - bid_level->price)/best_bid;
       bid_volume += weight * (bid_level->quantity);
       bid_level++;
     }
 
-    // Calculate ask volume for up to 8 levels
+    // Calculate ask volume for up to all levels
     quantity_t ask_volume = 0;
     std::set<LimitOrder>::iterator ask_level=sides[0].begin();
-    for (int i = 0; i<num_levels && ask_level!=sides[0].end(); i++) {
+    for (int i = 0; /*i<num_levels &&*/ ask_level!=sides[0].end(); i++) {
       weight = 1 - abs(ask_level->price - best_offer)/best_offer;
       ask_volume += weight * (ask_level->quantity);
       ask_level++;
@@ -416,8 +416,6 @@ public:
   void init(Bot::Communicator& com) {
     state.trader_id = trader_id;
     // state.log_path = "book.log";
-    start_time = time_ns();
-    cycle = time_ns();
 
     // Query User for input
     std::cout << "Please input the number of levels you want to use for signal (Suggested: 8): ";
@@ -427,6 +425,9 @@ public:
     std::cout << "\nPlease input signal difference needed to update market (Suggested: 0.1): ";
     std::cin >> meaningful_signal_diff;
     std::cout << "\n";
+
+    start_time = time_ns();
+    cycle = time_ns();
   }
 
   // EDIT THIS METHOD
@@ -458,7 +459,7 @@ public:
     int64_t now = time_ns();
     last = now;
 
-    if (now - cycle > 1e9) {
+    if (now - cycle > 1e8) {
       cycle = now;
 
       if (position > 20) {
