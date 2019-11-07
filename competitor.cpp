@@ -547,11 +547,12 @@ public:
     bid_quote = state.books[0].quote_size(true);
     ask_quote = state.books[0].quote_size(false);
 
+    /*
     std::cout << "Bid Quote: " << bid_quote << "\n";
     std::cout << "Ask Quote: " << ask_quote << "\n";
     std::cout << "Mid Price: " << mid_price << "\n";
     std::cout << "Get Second Ask Price: " << state.books[0].get_second_price(false) << "\n\n";
-
+    */
     
     if (ask_quote - bid_quote > 5000) {
       place_order(com, Common::Order{
@@ -572,6 +573,7 @@ public:
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
         });
+        return;
     } else if (bid_quote - ask_quote > 5000) {
       place_order(com, Common::Order{
           .ticker = 0,
@@ -591,6 +593,7 @@ public:
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
         });
+        return;
     }
 
     if (position > 240) {
