@@ -499,7 +499,6 @@ public:
     now = time_ns();
     last = now;
 
-    /*
     if (t_minus_one_signal == 2) {
       t_minus_one_signal = signal;
       return;
@@ -514,9 +513,8 @@ public:
       t_minus_one_signal = signal;
     }
 
-    state.books[0].print_book(state.log_path, state.open_orders);
+    // state.books[0].print_book(state.log_path, state.open_orders);
 
-    */
     if (now - cycle > 1e8) {
       cycle = now;
 
@@ -629,9 +627,9 @@ public:
     signal_difference = abs(avg_signal - previous_avg_signal);
     if (signal_difference == 0) {
       return;
-    } else if (signal > 0) {
+    } else if (avg_signal > 0) {
       // Move midprice up proportional to signal
-      if (abs(signal) > 0) {
+      if (abs(avg_signal) > 0) {
         // Cancel all open orders
 
         
@@ -663,9 +661,9 @@ public:
           .trader_id = trader_id
         });
       }
-    } else if (signal < 0) {
+    } else if (avg_signal < 0) {
       // Move midprice down proportional to signal
-      if (abs(signal) > 0) {
+      if (abs(avg_signal) > 0) {
         // Cancel all open orders
 
         
