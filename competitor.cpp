@@ -451,7 +451,7 @@ public:
         place_order(com, Common::Order{
           .ticker = 0,
           .price = state.get_bbo(0, true)-0.01,
-          .quantity = state.positions[0]
+          .quantity = state.positions[0],
           .buy = false,
           .ioc = true,
           .order_id = 0, // this order ID will be chosen randomly by com
