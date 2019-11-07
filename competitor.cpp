@@ -755,7 +755,7 @@ public:
   }
 
   void place_cancel(Bot::Communicator& com, const Common::Cancel& cancel) {
-    std::cout << "Canceling order";
+    // std::cout << "Canceling order";
     com.place_cancel(cancel);
   }
 
