@@ -103,14 +103,18 @@ public:
     // Calculate bid volume for up to 8 levels
     quantity_t bid_volume = 0;
     std::set<LimitOrder>::iterator bid_level=sides[1].begin();
-    for (int i = 0; i<8 && bid_level!=sides[1].end(); i++) 
+    for (int i = 0; i<8 && bid_level!=sides[1].end(); i++) {
       bid_volume += bid_level->quantity;
+      bid_level++;
+    }
 
     // Calculate ask volume for up to 8 levels
     quantity_t ask_volume = 0;
     std::set<LimitOrder>::iterator ask_level=sides[0].begin();
-    for (int i = 0; i<8 && ask_level!=sides[1].end(); i++) 
+    for (int i = 0; i<8 && ask_level!=sides[1].end(); i++) {
       ask_volume += ask_level->quantity;
+      ask_level++;
+    }
       
 
     // Calculate signal
@@ -118,6 +122,10 @@ public:
 
     return signal;
   }
+
+  //int num_levels(bool buy) {
+  //  int count = 0
+  //}
 
 
   void insert(Common::Order order_to_insert) {
