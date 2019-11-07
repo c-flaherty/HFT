@@ -606,6 +606,7 @@ public:
     }
 
     /* --------------- MAKER - MAKER STRATEGY START------------------- */
+    /*
     signal_difference = abs(avg_signal - previous_avg_signal);
     if (signal_difference == 0) {
       return;
@@ -680,7 +681,7 @@ public:
         });
       }
     } 
-    
+    */
     previous_signal = signal;
     previous_avg_signal = avg_signal;
    /* --------------- MAKER - MAKER STRATEGY END------------------- */
