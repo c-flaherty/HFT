@@ -555,6 +555,17 @@ public:
     std::cout << "Mid Price: " << mid_price << "\n";
     std::cout << "Get Second Ask Price: " << state.books[0].get_second_price(false) << "\n\n";
     */
+
+    if (position > 240) {
+      bid_volume = mkt_volume;
+      ask_volume = mkt_volume + 0.5 * position;
+    } else if (position < -40) {
+      bid_volume = mkt_volume + 0.5 * abs(position);
+      ask_volume = mkt_volume;
+    } else {
+      bid_volume = mkt_volume;
+      ask_volume = mkt_volume;
+    }
     
     if (ask_quote - bid_quote > 5000) {
       for (const auto& x : state.open_orders) {
@@ -568,7 +579,7 @@ public:
       place_order(com, Common::Order{
           .ticker = 0,
           .price = state.books[0].get_second_price(false)-0.01,
-          .quantity = 200,
+          .quantity = ask_volume,
           .buy = false,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -577,7 +588,7 @@ public:
       place_order(com, Common::Order{
           .ticker = 0,
           .price = best_offer,
-          .quantity = 200,
+          .quantity = bid_volume,
           .buy = true,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -596,7 +607,7 @@ public:
       place_order(com, Common::Order{
           .ticker = 0,
           .price = best_bid,
-          .quantity = 200,
+          .quantity = ask_volume,
           .buy = false,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -605,7 +616,7 @@ public:
       place_order(com, Common::Order{
           .ticker = 0,
           .price = state.books[0].get_second_price(true)+0.01,
-          .quantity = 200,
+          .quantity = bid_volume,
           .buy = true,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -614,44 +625,28 @@ public:
         return;
     }
 
-    /*
-    if (position > 240) {
-      bid_volume = mkt_volume;
-      ask_volume = mkt_volume + 0.5 * position;
-    } else if (position < -40) {
-      bid_volume = mkt_volume + 0.5 * abs(position);
-      ask_volume = mkt_volume;
-    } else {
-      bid_volume = mkt_volume;
-      ask_volume = mkt_volume;
-    }
-    */
-
     /* --------------- MAKER - MAKER STRATEGY START------------------- */
-    /*
     signal_difference = abs(avg_signal - previous_avg_signal);
     if (signal_difference == 0) {
       return;
     } else if (signal > 0) {
       // Move midprice up proportional to signal
-      if (abs(signal) > meaningful_signal_diff) {
+      if (abs(signal) > 0) {
         // Cancel all open orders
 
         
         for (const auto& x : state.open_orders) {
-          if (true || (x.second.buy && x.second.price < best_bid)) {
             place_cancel(com, Common::Cancel{
               .ticker = 0,
               .order_id = x.first,
               .trader_id = trader_id
             });
-          }
         }
 
         // Make new market
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = best_offer,
+          .price = mid_price,
           .quantity = bid_volume,
           .buy = true,
           .ioc = true,
@@ -670,24 +665,22 @@ public:
       }
     } else if (signal < 0) {
       // Move midprice down proportional to signal
-      if (abs(signal) > meaningful_signal_diff) {
+      if (abs(signal) > 0) {
         // Cancel all open orders
 
         
         for (const auto& x : state.open_orders) {
-          if (true || (!x.second.buy && x.second.price > best_offer)) {
             place_cancel(com, Common::Cancel{
               .ticker = 0,
               .order_id = x.first,
               .trader_id = trader_id
             });
-          }
         }
 
         // Make new market
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = state.books[0].get_second_price(false)+0.01,
+          .price = state.books[0].get_second_price(true)+0.01,
           .quantity = bid_volume,
           .buy = true,
           .ioc = false,
@@ -696,7 +689,7 @@ public:
         });
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = best_bid,
+          .price = mid_price,
           .quantity = ask_volume,
           .buy = false,
           .ioc = true,
@@ -705,7 +698,7 @@ public:
         });
       }
       
-    } */
+    }
     // previous_signal = signal;
     // previous_avg_signal = avg_signal;
    /* --------------- MAKER - MAKER STRATEGY END------------------- */
