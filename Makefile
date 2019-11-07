@@ -13,7 +13,7 @@ mybot: competitor.o
 	$(CXX) -o mybot kirin.o competitor.o $(CXXFLAGS)
 
 mybot_slow: competitor_slow.o
-	$(CXX) -o mybot kirin.o competitor_slow.o $(CXXFLAGS)
+	$(CXX) -o mybot_slow kirin.o competitor_slow.o $(CXXFLAGS)
 
 competitor.o: competitor.cpp
 	$(CXX) competitor.cpp $(CXXFLAGS) -c
