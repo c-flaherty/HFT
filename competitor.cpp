@@ -550,7 +550,7 @@ public:
         // Make new market
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = (1 + avg_signal) * mid_price + spread/2,
+          .price = (1 - avg_signal) * mid_price + spread/2,
           .quantity = bid_volume,
           .buy = true,
           .ioc = false,
@@ -559,7 +559,7 @@ public:
         });
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = (1 + avg_signal) * mid_price - spread/2,
+          .price = (1 - avg_signal) * mid_price - spread/2,
           .quantity = ask_volume,
           .buy = false,
           .ioc = false,
@@ -585,7 +585,7 @@ public:
         // Make new market
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = (1 + avg_signal) * mid_price + spread/2,
+          .price = (1 - avg_signal) * mid_price + spread/2,
           .quantity = bid_volume,
           .buy = true,
           .ioc = false,
@@ -594,7 +594,7 @@ public:
         });
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = (1 + avg_signal) * mid_price - spread/2,
+          .price = (1 - avg_signal) * mid_price - spread/2,
           .quantity = ask_volume,
           .buy = false,
           .ioc = false,
