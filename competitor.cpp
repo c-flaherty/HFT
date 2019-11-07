@@ -407,11 +407,11 @@ public:
                 << std::setw(15) << std::left << (state.get_pnl()/((time_ns() - start_time)/1e9))
                 << "\n\n";
 
-      std::cout << "Best bid: " 
-                << state.get_bbo(0, true)
-                << "\n"
-                << "Best offer: "
+      std::cout << "Best offer: "
                 << state.get_bbo(0, false)
+                << "\n"
+                << "Best bid: " 
+                << state.get_bbo(0, true)
                 << "\n"
                 << "Current spread: "
                 << state.get_spread(0)
@@ -467,7 +467,7 @@ public:
         place_order(com, Common::Order{
           .ticker = 0,
           .price = new_bid,
-          .quantity = bid_volume,
+          .quantity = 50,
           .buy = true,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -476,7 +476,7 @@ public:
         place_order(com, Common::Order{
           .ticker = 0,
           .price = new_offer,
-          .quantity = offer_volume,
+          .quantity = 50,
           .buy = false,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
