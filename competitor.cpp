@@ -509,6 +509,9 @@ public:
                 << "\n"
                 << "Current Cash: "
                 << state.cash
+                << "\n"
+                << "Realized PNL/Second: "
+                << std::setw(15) << std::left << (state.cash/((time_ns() - start_time)/1e9))
                 << "\n\n";
 
       std::cout << "Best offer: "
