@@ -552,7 +552,7 @@ public:
           .ticker = 0,
           .price = (1 + avg_signal) * mid_price + spread/2,
           .quantity = bid_volume,
-          .buy = false,
+          .buy = true,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
@@ -561,7 +561,7 @@ public:
           .ticker = 0,
           .price = (1 + avg_signal) * mid_price - spread/2,
           .quantity = ask_volume,
-          .buy = true,
+          .buy = false,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
@@ -587,7 +587,7 @@ public:
           .ticker = 0,
           .price = (1 + avg_signal) * mid_price + spread/2,
           .quantity = bid_volume,
-          .buy = false,
+          .buy = true,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
@@ -596,7 +596,7 @@ public:
           .ticker = 0,
           .price = (1 + avg_signal) * mid_price - spread/2,
           .quantity = ask_volume,
-          .buy = true,
+          .buy = false,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
