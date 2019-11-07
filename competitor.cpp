@@ -407,6 +407,9 @@ public:
                 << state.get_pnl()
                 << "\nPNL/Second: "
                 << std::setw(15) << std::left << (state.get_pnl()/((time_ns() - start_time)/1e9))
+                << "\n"
+                << "Current Position: "
+                << state.positions[0]
                 << "\n\n";
 
       std::cout << "Best offer: "
