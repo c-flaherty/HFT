@@ -403,14 +403,18 @@ public:
       cycle = now;
       std::cout << "Current PNL: " 
                 << state.get_pnl()
-                << "PNL/Second: "
-                << std::setw(15) << std::left << (state.get_pnl()/((time_ns() - start_time)/1e9));
+                << "\nPNL/Second: "
+                << std::setw(15) << std::left << (state.get_pnl()/((time_ns() - start_time)/1e9))
+                << "\n";
 
       std::cout << "Best bid: " 
                 << state.get_bbo(0, true)
                 << "\n"
                 << "Best offer: "
                 << state.get_bbo(0, false)
+                << "\n"
+                << "Signal: "
+                << state.get_signal(0)
                 << "\n";
     }
 
