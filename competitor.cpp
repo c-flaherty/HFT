@@ -440,7 +440,7 @@ public:
   double meaningful_signal_diff;
   
   quantity_t bid_volume, ask_volume, position, bid_quote, ask_quote;
-  double best_bid, best_offer, signal_difference, mid_price, spread, signal, t_minus_one_signal=2, t_minus_two_signal=2, avg_signal=0, previous_avg_signal;
+  double best_bid, best_offer, signal_difference, mid_price, spread, signal, t_minus_one_signal=2, t_minus_two_signal=2, avg_signal=0, previous_avg_signal, second_price;
 
 
   int64_t now;
@@ -541,11 +541,11 @@ public:
     bid_quote = state.books[0].quote_size(true);
     ask_quote = state.books[0].quote_size(false);
     
-    if (ask_quote > 3000) {
+    if (ask_quote > 3000 && (state.books[0].get_second_price(false) - best_offer > 0.05)) {
       place_order(com, Common::Order{
           .ticker = 0,
           .price = state.books[0].get_second_price(false),
-          .quantity = 200,
+          .quantity = ask_quote,
           .buy = false,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -553,19 +553,19 @@ public:
         });
       place_order(com, Common::Order{
           .ticker = 0,
-          .price = best_bid,
-          .quantity = 200,
+          .price = best_offer,
+          .quantity = ask_quote,
           .buy = true,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
         });
       return;
-    } else if (bid_quote > 3000) {
+    } else if (bid_quote > 3000 && (best_bid - state.books[0].get_second_price(true) > 0.05)) {
       place_order(com, Common::Order{
           .ticker = 0,
-          .price = best_offer,
-          .quantity = 200,
+          .price = best_bid,
+          .quantity = bid_quote,
           .buy = false,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -574,7 +574,7 @@ public:
       place_order(com, Common::Order{
           .ticker = 0,
           .price = state.books[0].get_second_price(true),
-          .quantity = 200,
+          .quantity = bid_quote,
           .buy = true,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
