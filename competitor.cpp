@@ -65,12 +65,12 @@ public:
   Currently, I calculate bid and ask volume for all levels.
   I then calculate (bid_vol - ask_vol)/(bid_vol + ask_vol)
   */
-  float get_signal() const {
+  double get_signal() const {
     bool bid = true, ask = false;
     price_t best_bid = get_bbo(bid);
     price_t best_offer = get_bbo(ask);
 
-    int signal = 0;
+    double signal = 0.0;
 
     if (best_bid == 0.0 || best_offer == 0.0) {
       return signal; // no signal can be found in this case
@@ -95,7 +95,7 @@ public:
     }
 
     // Calculate signal
-    signal = (bid_volume - ask_volume)/(bid_volume + ask_volume);
+    signal = ((double)bid_volume - (double)ask_volume)/((double)bid_volume + (double)ask_volume);
 
     return signal;
   }
@@ -324,7 +324,7 @@ struct MyState {
     return books[ticker].get_bbo(buy);
   }
 
-  float get_signal(ticker_t ticker) {
+  double get_signal(ticker_t ticker) {
     return books[ticker].get_signal();
   }
 
