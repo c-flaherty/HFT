@@ -9,6 +9,7 @@
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
+#include <cstdlib>
 
 
 struct LimitOrder {
@@ -365,6 +366,7 @@ public:
   }
   int64_t last = 0, start_time;
   int64_t cycle = 0;
+  double previous_signal = 0;
 
   bool trade_with_me_in_this_packet = false;
 
@@ -444,11 +446,11 @@ public:
     double available_position = 2000 - position;
     quantity_t bid_volume, offer_volume;
 
-    if (signal == 0) {
+    if (abs(previous_signal - signal) == 0) {
       return;
     } else if (signal > 0) {
       // Move midprice up proportional to signal
-      if (signal > 0.1) {
+      if (abs(previous_signal - signal) > 0.1) {
         // Cancel all open orders
         for (const auto& x : state.open_orders) {
           place_cancel(com, Common::Cancel{
@@ -485,7 +487,7 @@ public:
       }
     } else if (signal < 0) {
       // Move midprice down proportional to signal
-      if (signal < -0.1) {
+      if (abs(previous_signal - signal) > 0.1) {
         // Cancel all open orders
         for (const auto& x : state.open_orders) {
           place_cancel(com, Common::Cancel{
