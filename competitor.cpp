@@ -541,7 +541,7 @@ public:
     bid_quote = state.books[0].quote_size(true);
     ask_quote = state.books[0].quote_size(false);
     
-    if (ask_quote > 3000 && (state.books[0].get_second_price(false) - best_offer > 0.05)) {
+    if (ask_quote > 3000) {
       place_order(com, Common::Order{
           .ticker = 0,
           .price = state.books[0].get_second_price(false),
@@ -561,7 +561,7 @@ public:
           .trader_id = trader_id
         });
       return;
-    } else if (bid_quote > 3000 && (best_bid - state.books[0].get_second_price(true) > 0.05)) {
+    } else if (bid_quote > 3000) {
       place_order(com, Common::Order{
           .ticker = 0,
           .price = best_bid,
