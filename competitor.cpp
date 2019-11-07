@@ -458,8 +458,8 @@ public:
         // Make new market
         new_bid = mid_price + signalToCents;
         new_offer = mid_price + signalToCents;
-        bid_volume = available_position/2.0;
-        offer_volume = available_position/2.0;
+        bid_volume = 0.25 * available_position;
+        offer_volume = 0.25 * available_position;
 
         place_order(com, Common::Order{
           .ticker = 0,
