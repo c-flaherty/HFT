@@ -483,11 +483,10 @@ public:
       t_minus_one_signal = signal;
     }
 
+    state.books[0].print_book(state.log_path, state.open_orders);
+    
     if (now - cycle > 1e8) {
       cycle = now;
-
-      std::cout << "Logging";
-      state.books[0].print_book(state.log_path, state.open_orders);
 
       /*
       if (position > 20) {
