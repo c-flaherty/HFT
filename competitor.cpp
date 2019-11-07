@@ -136,6 +136,12 @@ public:
     return vol;
   }
 
+  price_t get_second_price(bool buy) {
+    std::set<LimitOrder>::iterator level=sides[buy].begin();
+    level++;
+    return level->price;
+  }
+
   int num_levels(bool buy) {
     int count = 0;
     for (std::set<LimitOrder>::iterator level = sides[buy].begin(); level!=sides[buy].end(); level++)
@@ -433,11 +439,12 @@ public:
   quantity_t mkt_volume;
   double meaningful_signal_diff;
   
-  quantity_t bid_volume, ask_volume, position;
+  quantity_t bid_volume, ask_volume, position, bid_quote, ask_quote;
   double best_bid, best_offer, signal_difference, mid_price, spread, signal, t_minus_one_signal=2, t_minus_two_signal=2, avg_signal=0, previous_avg_signal;
 
 
   int64_t now;
+
 
 
   // (maybe) EDIT THIS METHOD
@@ -531,13 +538,15 @@ public:
       }
       */
     }
-    /*
-    if (best_bid > best_offer) {
+    bid_quote = state.books[0].quote_size(true);
+    ask_quote = state.books[0].quote_size(false);
+    
+    if (ask_quote > 3000) {
       place_order(com, Common::Order{
           .ticker = 0,
-          .price = best_offer,
-          .quantity = state.books[0].quote_size(false),
-          .buy = true,
+          .price = state.books[0].get_second_price(false),
+          .quantity = 200,
+          .buy = false,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
@@ -545,14 +554,34 @@ public:
       place_order(com, Common::Order{
           .ticker = 0,
           .price = best_bid,
-          .quantity = state.books[0].quote_size(true),
-          .buy = false,
+          .quantity = 200,
+          .buy = true,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
         });
       return;
-    }*/
+    } else if (bid_quote > 3000) {
+      place_order(com, Common::Order{
+          .ticker = 0,
+          .price = best_offer,
+          .quantity = 200,
+          .buy = false,
+          .ioc = false,
+          .order_id = 0, // this order ID will be chosen randomly by com
+          .trader_id = trader_id
+        });
+      place_order(com, Common::Order{
+          .ticker = 0,
+          .price = state.books[0].get_second_price(true),
+          .quantity = 200,
+          .buy = true,
+          .ioc = false,
+          .order_id = 0, // this order ID will be chosen randomly by com
+          .trader_id = trader_id
+        });
+      return;
+    }
 
     if (position > 40) {
       bid_volume = mkt_volume;
@@ -566,7 +595,7 @@ public:
     }
 
     /* --------------- MAKER - MAKER STRATEGY START------------------- */
-    
+    /*
     signal_difference = abs(avg_signal - previous_avg_signal);
     if (signal_difference == 0) {
       return;
@@ -641,6 +670,7 @@ public:
         });
       }
     } 
+    */
     
     previous_signal = signal;
     previous_avg_signal = avg_signal;
