@@ -533,7 +533,7 @@ public:
       return;
     } else if (avg_signal > 0) {
       // Move midprice up proportional to signal
-      if (avg_signal > meaningful_signal_diff) {
+      if (abs(avg_signal) > meaningful_signal_diff) {
         // Cancel all open orders
 
         for (const auto& x : state.open_orders) {
@@ -568,7 +568,7 @@ public:
       }
     } else if (avg_signal < 0) {
       // Move midprice down proportional to signal
-      if (avg_signal > meaningful_signal_diff) {
+      if (abs(avg_signal) > meaningful_signal_diff) {
         // Cancel all open orders
 
         for (const auto& x : state.open_orders) {
