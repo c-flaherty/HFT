@@ -130,6 +130,8 @@ public:
     int count = 0;
     for (std::set<LimitOrder>::iterator level = sides[buy].begin(); level!=sides[buy].end(); level++)
       count+=1;
+
+    return count;
   }
 
   void insert(Common::Order order_to_insert) {
