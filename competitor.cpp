@@ -399,7 +399,7 @@ public:
     //}
     last = now;
 
-    if (now - cycle > 1e8) {
+    if (now - cycle > 3e8) {
       cycle = now;
       std::cout << "Current PNL: " 
                 << state.get_pnl()
@@ -445,7 +445,7 @@ public:
       return;
     } else if (signal > 0) {
       // Move midprice up proportional to signal
-      if (signal > 0.5) {
+      if (signal > 0.1) {
         // Cancel all open orders
         for (const auto& x : state.open_orders) {
           place_cancel(com, Common::Cancel{
@@ -482,7 +482,7 @@ public:
       }
     } else if (signal < 0) {
       // Move midprice down proportional to signal
-      if (signal < -0.5) {
+      if (signal < -0.1) {
         // Cancel all open orders
         for (const auto& x : state.open_orders) {
           place_cancel(com, Common::Cancel{
@@ -525,15 +525,13 @@ public:
     state.on_cancel_update(update);
   }
 
-  // (maybe) EDIT THIS METHOD
+  // (maybe) EDIT THIS METHOD std::cout << update.getMsg() << std::endl;
   void on_reject_order_update(Common::RejectOrderUpdate& update, Bot::Communicator& com) {
-    std::cout << update.getMsg() << std::endl;
   }
 
-  // (maybe) EDIT THIS METHOD
+  // (maybe) EDIT THIS METHOD std::cout << update.getMsg() << std::endl;
   void on_reject_cancel_update(Common::RejectCancelUpdate& update, Bot::Communicator& com) {
     if (update.reason != Common::INVALID_ORDER_ID) {
-      std::cout << update.getMsg() << std::endl;
     }
   }
 
