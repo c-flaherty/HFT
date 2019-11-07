@@ -556,7 +556,7 @@ public:
     if (ask_quote - bid_quote > 1000) {
       place_order(com, Common::Order{
           .ticker = 0,
-          .price = state.books[0].get_second_price(false)-0.01,
+          .price = best_offer-0.01,
           .quantity = 200,
           .buy = false,
           .ioc = false,
@@ -565,7 +565,7 @@ public:
         });
       place_order(com, Common::Order{
           .ticker = 0,
-          .price = best_offer,
+          .price = best_bid,
           .quantity = 200,
           .buy = true,
           .ioc = false,
@@ -576,8 +576,8 @@ public:
     } else if (bid_quote - ask_quote > 1000) {
       place_order(com, Common::Order{
           .ticker = 0,
-          .price = best_bid,
-          .quantity = 200, bid_quote),
+          .price = best_offer,
+          .quantity = 200,
           .buy = false,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -585,8 +585,8 @@ public:
         });
       place_order(com, Common::Order{
           .ticker = 0,
-          .price = state.books[0].get_second_price(true)+0.01,
-          .quantity = 200, bid_quote),
+          .price = best_bid+0.01,
+          .quantity = 200,
           .buy = true,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
