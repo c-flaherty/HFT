@@ -532,8 +532,8 @@ public:
       if (avg_signal > meaningful_signal_diff) {
         // Cancel all open orders
 
-        if (std::signbit(avg_signal) != std::signbit(previous_signal)) {
-          for (const auto& x : state.open_orders) {
+        for (const auto& x : state.open_orders) {
+          if (x.second.buy && x.second.price < best_bid) {
             place_cancel(com, Common::Cancel{
               .ticker = 0,
               .order_id = x.first,
@@ -566,8 +566,9 @@ public:
       // Move midprice down proportional to signal
       if (avg_signal > meaningful_signal_diff) {
         // Cancel all open orders
-        if (std::signbit(avg_signal) != std::signbit(previous_signal)) {
-          for (const auto& x : state.open_orders) {
+
+        for (const auto& x : state.open_orders) {
+          if (!x.second.buy && x.second.price > best_offer) {
             place_cancel(com, Common::Cancel{
               .ticker = 0,
               .order_id = x.first,
