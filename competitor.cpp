@@ -538,7 +538,7 @@ public:
                 << sum_diff_in_spread/num_updates
                 << "\n\n";
 
-      if (state.positions[0] > 500) {
+      if (state.positions[0] > 20) {
         place_order(com, Common::Order{
           .ticker = 0,
           .price = state.get_bbo(0, true)-0.05,
@@ -549,7 +549,7 @@ public:
           .trader_id = trader_id
         });
         return;
-      } else if (state.positions[0] < -500) {
+      } else if (state.positions[0] < -20) {
         place_order(com, Common::Order{
           .ticker = 0,
           .price = state.get_bbo(0, false),
