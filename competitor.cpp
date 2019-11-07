@@ -541,9 +541,9 @@ public:
     if (now - cycle > 1e9) {
       cycle = now;
       std::cout << "Num Bid Levels: "
-                << state.books[0].get_levels(1)
+                << state.books[0].num_levels(1)
                 << "\nNum Ask Levels: "
-                << state.books[0].get_levels(0)
+                << state.books[0].num_levels(0)
                 << "\n\n";
       /*
       std::cout << "Current PNL: " 
