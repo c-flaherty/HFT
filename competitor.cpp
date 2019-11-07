@@ -376,6 +376,28 @@ public:
     // state.log_path = "book.log";
     start_time = time_ns();
     cycle = time_ns();
+
+    std::cout << "Bot Starting \n"
+            << "Best offer: "
+            << state.get_bbo(0, false)
+            << "\n"
+            << "Best bid: " 
+            << state.get_bbo(0, true)
+            << "\n"
+            << "Current spread: "
+            << state.get_spread(0)
+            << "\n"
+            << "Signal: "
+            << state.get_signal(0)
+            << "\n\n";
+    std::cout << "Starting PNL: " 
+                << state.get_pnl()
+                << "\nStarting PNL/Second: "
+                << std::setw(15) << std::left << (state.get_pnl()/((time_ns() - start_time)/1e9))
+                << "\n"
+                << "Starting Position: "
+                << state.positions[0]
+                << "\n\n";
   }
 
 
@@ -424,6 +446,18 @@ public:
                 << "Signal: "
                 << state.get_signal(0)
                 << "\n\n";
+
+      if (state.positions[0] > 1000) {
+        place_order(com, Common::Order{
+          .ticker = 0,
+          .price = state.get_bbo(0, true)-0.01,
+          .quantity = state.positions[0]
+          .buy = false,
+          .ioc = true,
+          .order_id = 0, // this order ID will be chosen randomly by com
+          .trader_id = trader_id
+        });
+      }
     }
 
 
@@ -594,8 +628,6 @@ public:
 
 
 int main(int argc, const char ** argv) {
-  std::cout << "Bot Started";
-
 
   std::string prefix = "comp"; // DO NOT CHANGE THIS
 
@@ -606,6 +638,7 @@ int main(int argc, const char ** argv) {
   Manager::Manager manager;
 
   std::vector<Bot::AbstractBot*> bots {m};
+  
   manager.run_competitors(prefix, bots);
 
   return 0;
