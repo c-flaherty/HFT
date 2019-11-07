@@ -681,8 +681,8 @@ public:
           .trader_id = trader_id
         });
       }
-      */
-    } 
+      
+    } */
     previous_signal = signal;
     previous_avg_signal = avg_signal;
    /* --------------- MAKER - MAKER STRATEGY END------------------- */
