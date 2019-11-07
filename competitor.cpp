@@ -399,7 +399,7 @@ public:
     //}
     last = now;
 
-    if (now - cycle > 10000) {
+    if (now - cycle > 10e9) {
       cycle = now;
       std::cout << "Current PNL: " 
                 << state.get_pnl()
