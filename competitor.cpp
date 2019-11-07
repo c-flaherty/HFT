@@ -105,10 +105,10 @@ public:
     quantity_t bid_volume = 0;
     std::set<LimitOrder>::iterator bid_level=sides[1].begin();
     for (int i = 0; i<num_levels && bid_level!=sides[1].end(); i++) {
-      if (i == 0 && bid_level -> quantity >= 1000) {
-        bid_level++;
-        continue; 
-      }
+      //if (i == 0 && bid_level -> quantity >= 1000) {
+      //  bid_level++;
+      //  continue; 
+      //}
       weight = 1 - abs(best_bid - bid_level->price)/best_bid;
       bid_volume += weight * (bid_level->quantity);
       bid_level++;
@@ -118,10 +118,10 @@ public:
     quantity_t ask_volume = 0;
     std::set<LimitOrder>::iterator ask_level=sides[0].begin();
     for (int i = 0; i<num_levels && ask_level!=sides[0].end(); i++) {
-      if (i == 0 && ask_level -> quantity >= 1000) {
-        ask_level++;
-        continue; 
-      }
+      //if (i == 0 && ask_level -> quantity >= 1000) {
+      //  ask_level++;
+      //  continue; 
+      //}
       weight = 1 - abs(ask_level->price - best_offer)/best_offer;
       ask_volume += weight * (ask_level->quantity);
       ask_level++;
@@ -553,7 +553,7 @@ public:
     std::cout << "Get Second Ask Price: " << state.books[0].get_second_price(false) << "\n\n";
 
     
-    if (ask_quote - bid_quote > 1000) {
+    if (ask_quote - bid_quote > 5000) {
       place_order(com, Common::Order{
           .ticker = 0,
           .price = best_offer-0.01,
@@ -573,7 +573,7 @@ public:
           .trader_id = trader_id
         });
       return;
-    } else if (bid_quote - ask_quote > 1000) {
+    } else if (bid_quote - ask_quote > 5000) {
       place_order(com, Common::Order{
           .ticker = 0,
           .price = best_offer,
@@ -607,7 +607,6 @@ public:
     }
 
     /* --------------- MAKER - MAKER STRATEGY START------------------- */
-    /*
     signal_difference = abs(avg_signal - previous_avg_signal);
     if (signal_difference == 0) {
       return;
@@ -682,7 +681,6 @@ public:
         });
       }
     } 
-    */
     previous_signal = signal;
     previous_avg_signal = avg_signal;
    /* --------------- MAKER - MAKER STRATEGY END------------------- */
