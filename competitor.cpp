@@ -100,11 +100,13 @@ public:
     */
 
     int levels = 8;
+    double weight;
     // Calculate bid volume for up to 8 levels
     quantity_t bid_volume = 0;
     std::set<LimitOrder>::iterator bid_level=sides[1].begin();
     for (int i = 0; i<8 && bid_level!=sides[1].end(); i++) {
-      bid_volume += bid_level->quantity;
+      weight = 1 - abs(best_bid - bid_level->price)/best_bid;
+      bid_volume += weight * (bid_level->quantity);
       bid_level++;
     }
 
@@ -112,7 +114,8 @@ public:
     quantity_t ask_volume = 0;
     std::set<LimitOrder>::iterator ask_level=sides[0].begin();
     for (int i = 0; i<8 && ask_level!=sides[0].end(); i++) {
-      ask_volume += ask_level->quantity;
+      weight = 1 - abs(ask_level->price - best_offer)/best_offer;
+      ask_volume += weight * (ask_level->quantity);
       ask_level++;
     }
       
