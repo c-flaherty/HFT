@@ -555,7 +555,7 @@ public:
     if (ask_quote > 3000) {
       place_order(com, Common::Order{
           .ticker = 0,
-          .price = state.books[0].get_second_price(false),
+          .price = best_offer - 0.01,
           .quantity = std::min((2000-position)/2, ask_quote),
           .buy = false,
           .ioc = false,
@@ -564,7 +564,7 @@ public:
         });
       place_order(com, Common::Order{
           .ticker = 0,
-          .price = best_offer,
+          .price = best_bid,
           .quantity = std::min((2000-position)/2, ask_quote),
           .buy = true,
           .ioc = false,
@@ -575,7 +575,7 @@ public:
     } else if (bid_quote > 3000) {
       place_order(com, Common::Order{
           .ticker = 0,
-          .price = best_bid,
+          .price = best_offer,
           .quantity = std::min((2000-position)/2, bid_quote),
           .buy = false,
           .ioc = false,
@@ -584,7 +584,7 @@ public:
         });
       place_order(com, Common::Order{
           .ticker = 0,
-          .price = state.books[0].get_second_price(true),
+          .price = best_bid+0.01,
           .quantity = std::min((2000-position)/2, bid_quote),
           .buy = true,
           .ioc = false,
