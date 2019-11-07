@@ -533,7 +533,7 @@ public:
         // Cancel all open orders
 
         for (const auto& x : state.open_orders) {
-          if (x.second.buy && x.second.price < best_bid) {
+          if (true || (x.second.buy && x.second.price < best_bid)) {
             place_cancel(com, Common::Cancel{
               .ticker = 0,
               .order_id = x.first,
@@ -545,7 +545,7 @@ public:
         // Make new market
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = mid_price,
+          .price = (1 + avg_signal) * mid_price + spread/2,
           .quantity = bid_volume,
           .buy = true,
           .ioc = false,
@@ -554,7 +554,7 @@ public:
         });
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = std::max(mid_price + 0.01, mid_price + spread),
+          .price = (1 + avg_signal) * mid_price - spread/2,
           .quantity = ask_volume,
           .buy = false,
           .ioc = false,
@@ -568,7 +568,7 @@ public:
         // Cancel all open orders
 
         for (const auto& x : state.open_orders) {
-          if (!x.second.buy && x.second.price > best_offer) {
+          if (true || (!x.second.buy && x.second.price > best_offer)) {
             place_cancel(com, Common::Cancel{
               .ticker = 0,
               .order_id = x.first,
@@ -580,7 +580,7 @@ public:
         // Make new market
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = std::min(mid_price - 0.1, mid_price + spread),
+          .price = (1 + avg_signal) * mid_price + spread/2,
           .quantity = bid_volume,
           .buy = true,
           .ioc = false,
@@ -589,7 +589,7 @@ public:
         });
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = mid_price,
+          .price = (1 + avg_signal) * mid_price - spread/2,
           .quantity = ask_volume,
           .buy = false,
           .ioc = false,
