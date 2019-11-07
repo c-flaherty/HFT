@@ -292,7 +292,7 @@ struct MyState {
   MyState(trader_id_t trader_id) :
     trader_id(trader_id), books(), submitted(), open_orders(),
     cash(), positions(), volume_traded(), last_trade_price(100.0),
-    log_path("") {}
+    log_path(""), long_term_orders() {}
 
   MyState() : MyState(0) {}
 
@@ -316,8 +316,16 @@ struct MyState {
         open_orders.erase(update.resting_order_id);
       }
 
+      if (long_term_orders.find(update.resting_order_id) != long_term_orders.end()) {
+        long_term_orders.erase(update.resting_order_id);
+      }
+
     } else if (submitted.count(update.aggressing_order_id)) {
       volume_traded += update.quantity;
+
+      if (long_term_orders.find(update.aggressing_order_id) != long_term_orders.end()) {
+        long_term_orders.erase(update.aggressing_order_id);
+      }
 
       update_position(update.ticker, update.price,
                       update.buy ? update.quantity : -update.quantity);
@@ -410,6 +418,7 @@ struct MyState {
   quantity_t volume_traded;
   price_t last_trade_price;
   std::string log_path;
+  std::set<order_id_t> long_term_orders;
 
 };
 
@@ -554,10 +563,10 @@ public:
     std::cout << "Get Second Ask Price: " << state.books[0].get_second_price(false) << "\n\n";
     */
 
-    if (position > 240) {
+    if (position > 80) {
       bid_volume = mkt_volume;
       ask_volume = mkt_volume + 0.5 * position;
-    } else if (position < -40) {
+    } else if (position < -80) {
       bid_volume = mkt_volume + 0.5 * abs(position);
       ask_volume = mkt_volume;
     } else {
@@ -566,15 +575,7 @@ public:
     }
     
     if (ask_quote - bid_quote > 5000) {
-      for (const auto& x : state.open_orders) {
-        place_cancel(com, Common::Cancel{
-          .ticker = 0,
-          .order_id = x.first,
-          .trader_id = trader_id
-        });
-      }
-
-      place_order(com, Common::Order{
+      state.long_term_orders.insert(place_order(com, Common::Order{
           .ticker = 0,
           .price = state.books[0].get_second_price(false)-0.01,
           .quantity = ask_volume,
@@ -582,36 +583,9 @@ public:
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
-        });
-      place_order(com, Common::Order{
-          .ticker = 0,
-          .price = best_offer,
-          .quantity = bid_volume,
-          .buy = true,
-          .ioc = false,
-          .order_id = 0, // this order ID will be chosen randomly by com
-          .trader_id = trader_id
-        });
-        return;
+        }));
     } else if (bid_quote - ask_quote > 5000) {
-      for (const auto& x : state.open_orders) {
-        place_cancel(com, Common::Cancel{
-          .ticker = 0,
-          .order_id = x.first,
-          .trader_id = trader_id
-        });
-      }
-
-      place_order(com, Common::Order{
-          .ticker = 0,
-          .price = best_bid,
-          .quantity = ask_volume,
-          .buy = false,
-          .ioc = false,
-          .order_id = 0, // this order ID will be chosen randomly by com
-          .trader_id = trader_id
-        });
-      place_order(com, Common::Order{
+      state.long_term_orders.insert(place_order(com, Common::Order{
           .ticker = 0,
           .price = state.books[0].get_second_price(true)+0.01,
           .quantity = bid_volume,
@@ -619,8 +593,7 @@ public:
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
-        });
-        return;
+        }));
     }
 
     /* --------------- MAKER - MAKER STRATEGY START------------------- */
@@ -634,11 +607,13 @@ public:
 
         
         for (const auto& x : state.open_orders) {
-            place_cancel(com, Common::Cancel{
-              .ticker = 0,
-              .order_id = x.first,
-              .trader_id = trader_id
-            });
+            if (state.long_term_orders.find(x.first) == state.long_term_orders.end()) {
+              place_cancel(com, Common::Cancel{
+                .ticker = 0,
+                .order_id = x.first,
+                .trader_id = trader_id
+              });
+            }
         }
 
         // Make new market
@@ -668,11 +643,13 @@ public:
 
         
         for (const auto& x : state.open_orders) {
+          if (state.long_term_orders.find(x.first) == state.long_term_orders.end()) {
             place_cancel(com, Common::Cancel{
               .ticker = 0,
               .order_id = x.first,
               .trader_id = trader_id
             });
+          }
         }
 
         // Make new market
