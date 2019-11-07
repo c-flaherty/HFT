@@ -467,7 +467,7 @@ public:
     if (now - cycle > 1e8) {
       cycle = now;
 
-      books[0].print_book(state.log_path, state.open_orders);
+      // state.books[0].print_book(state.log_path, state.open_orders);
 
       /*
       if (position > 20) {
