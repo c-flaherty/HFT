@@ -474,7 +474,7 @@ public:
       t_minus_one_signal = signal;
       return;
     } else {
-      previous_signal = avg_signal;
+      previous_avg_signal = avg_signal;
       avg_signal = (t_minus_two_signal + t_minus_one_signal + signal)/3;
       t_minus_two_signal = t_minus_two_signal;
       t_minus_one_signal = signal;
