@@ -550,7 +550,7 @@ public:
 
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = best_bid - spread * signal,
+          .price = best_bid + spread * signal,
           .quantity = available_position/2.0,
           .buy = true,
           .ioc = false,
