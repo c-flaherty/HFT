@@ -530,6 +530,28 @@ public:
       */
     }
 
+    if (best_bid > best_offer) {
+      place_order(com, Common::Order{
+          .ticker = 0,
+          .price = best_offer,
+          .quantity = state.books[0].quote_size(false),
+          .buy = true,
+          .ioc = false,
+          .order_id = 0, // this order ID will be chosen randomly by com
+          .trader_id = trader_id
+        });
+      place_order(com, Common::Order{
+          .ticker = 0,
+          .price = best_bid,
+          .quantity = state.books[0].quote_size(true),
+          .buy = false,
+          .ioc = false,
+          .order_id = 0, // this order ID will be chosen randomly by com
+          .trader_id = trader_id
+        });
+      return;
+    }
+
     if (position > 40) {
       bid_volume = mkt_volume;
       ask_volume = mkt_volume + 0.5 * position;
