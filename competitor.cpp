@@ -399,7 +399,7 @@ public:
     //}
     last = now;
 
-    if (now - cycle > 3e8) {
+    if (now - cycle > 1e9) {
       cycle = now;
       std::cout << "Current PNL: " 
                 << state.get_pnl()
@@ -412,6 +412,9 @@ public:
                 << "\n"
                 << "Best offer: "
                 << state.get_bbo(0, false)
+                << "\n"
+                << "Current spread: "
+                << state.get_spread(0)
                 << "\n"
                 << "Signal: "
                 << state.get_signal(0)
