@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <cstdlib>
+#include <math.h> 
 
 
 struct LimitOrder {
@@ -530,12 +531,15 @@ public:
       // Move midprice up proportional to signal
       if (signal_difference > meaningful_signal_diff || abs(position) <= 20) {
         // Cancel all open orders
-        for (const auto& x : state.open_orders) {
-          place_cancel(com, Common::Cancel{
-            .ticker = 0,
-            .order_id = x.first,
-            .trader_id = trader_id
-          });
+
+        if (std::signbit(avg_signal) != std::signbit(previous_signal)) {
+          for (const auto& x : state.open_orders) {
+            place_cancel(com, Common::Cancel{
+              .ticker = 0,
+              .order_id = x.first,
+              .trader_id = trader_id
+            });
+          }
         }
 
         // Make new market
@@ -562,12 +566,14 @@ public:
       // Move midprice down proportional to signal
       if (signal_difference > meaningful_signal_diff || abs(position) <= 20) {
         // Cancel all open orders
-        for (const auto& x : state.open_orders) {
-          place_cancel(com, Common::Cancel{
-            .ticker = 0,
-            .order_id = x.first,
-            .trader_id = trader_id
-          });
+        if (std::signbit(avg_signal) != std::signbit(previous_signal)) {
+          for (const auto& x : state.open_orders) {
+            place_cancel(com, Common::Cancel{
+              .ticker = 0,
+              .order_id = x.first,
+              .trader_id = trader_id
+            });
+          }
         }
 
         // Make new market
