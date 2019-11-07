@@ -550,7 +550,7 @@ public:
       place_order(com, Common::Order{
           .ticker = 0,
           .price = state.books[0].get_second_price(false),
-          .quantity = ask_quote,
+          .quantity = std::min((2000-position)/2, ask_quote),
           .buy = false,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -559,7 +559,7 @@ public:
       place_order(com, Common::Order{
           .ticker = 0,
           .price = best_offer,
-          .quantity = ask_quote,
+          .quantity = std::min((2000-position)/2, ask_quote),
           .buy = true,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -570,7 +570,7 @@ public:
       place_order(com, Common::Order{
           .ticker = 0,
           .price = best_bid,
-          .quantity = bid_quote,
+          .quantity = std::min((2000-position)/2, bid_quote),
           .buy = false,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -579,7 +579,7 @@ public:
       place_order(com, Common::Order{
           .ticker = 0,
           .price = state.books[0].get_second_price(true),
-          .quantity = bid_quote,
+          .quantity = std::min((2000-position)/2, bid_quote),
           .buy = true,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
