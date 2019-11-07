@@ -553,10 +553,10 @@ public:
     std::cout << "Get Second Ask Price: " << state.books[0].get_second_price(false) << "\n\n";
 
     
-    if (ask_quote - bid_quote > 600) {
+    if (ask_quote - bid_quote > 1000) {
       place_order(com, Common::Order{
           .ticker = 0,
-          .price = state.books[0].get_second_price(false),
+          .price = state.books[0].get_second_price(false)-0.01,
           .quantity = std::min((2000-position)/2, ask_quote),
           .buy = false,
           .ioc = false,
@@ -573,7 +573,7 @@ public:
           .trader_id = trader_id
         });
       return;
-    } else if (bid_quote - ask_quote > 600) {
+    } else if (bid_quote - ask_quote > 1000) {
       place_order(com, Common::Order{
           .ticker = 0,
           .price = best_bid,
@@ -585,7 +585,7 @@ public:
         });
       place_order(com, Common::Order{
           .ticker = 0,
-          .price = state.books[0].get_second_price(true),
+          .price = state.books[0].get_second_price(true)+0.01,
           .quantity = std::min((2000-position)/2, bid_quote),
           .buy = true,
           .ioc = false,
