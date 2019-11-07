@@ -547,8 +547,8 @@ public:
                 << " ; pnl/volume = "
                 << std::setw(15) << std::left << (state.volume_traded ? pnl/state.volume_traded : 0.0)
                 << std::endl;
-    }
     */
+    }
   }
 
   order_id_t place_order(Bot::Communicator& com, const Common::Order& order) {
