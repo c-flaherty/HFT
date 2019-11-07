@@ -367,6 +367,8 @@ public:
   int64_t last = 0, start_time;
   int64_t cycle = 0;
   double previous_signal = 0;
+  double cumulative_signal_over_second = 0;
+  int previous_directional_bet_is_bid = -1; // 1 is bet, 0 is ask, -1 is undefined
 
   bool trade_with_me_in_this_packet = false;
 
@@ -417,10 +419,21 @@ public:
   void on_order_update(Common::OrderUpdate & update, Bot::Communicator& com){
     state.on_order_update(update);
 
+    // a way to put in a bid of quantity 1 at the current best bid
+    double best_bid = state.get_bbo(0, true);
+    double best_offer = state.get_bbo(0, false);
+    double mid_price = state.get_mid_price(0);
+    double spread = state.get_spread(0);
+    double signal = state.get_signal(0);
+    cumulative_signal_over_second += signal;
+    double signalToCents = signal/10.0;
+    double newSpread = spread + signalToCents;
+    double new_bid, new_offer;
+    quantity_t position = state.positions[0];
+    double available_position = 2000 - position;
+    quantity_t bid_volume, offer_volume;
+
     int64_t now = time_ns();
-    //if (now - last < 10e6) { // 10ms
-    //  return;
-    //}
     last = now;
 
     if (now - cycle > 1e9) {
@@ -460,9 +473,8 @@ public:
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
         });
-      }
-
-      if (state.positions[0] < -500) {
+        return;
+      } else if (state.positions[0] < -500) {
         place_order(com, Common::Order{
           .ticker = 0,
           .price = state.get_bbo(0, false)+0.01,
@@ -472,32 +484,64 @@ public:
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
         });
-      }      
+        return;
+      }
+
+      /* -------------- DIRECTIONAL STRATEGY --------------- */
+
+      // Exit previous bet
+      if (previous_directional_bet_is_bid == 1) {
+        place_order(com, Common::Order{
+          .ticker = 0,
+          .price = state.get_bbo(0, true)-0.01,
+          .quantity = 20,
+          .buy = false,
+          .ioc = true,
+          .order_id = 0, // this order ID will be chosen randomly by com
+          .trader_id = trader_id
+        });
+      } else if (previous_directional_bet_is_bid == 0) {
+        place_order(com, Common::Order{
+          .ticker = 0,
+          .price = state.get_bbo(0, false)+0.01,
+          .quantity = 20,
+          .buy = true,
+          .ioc = true,
+          .order_id = 0, // this order ID will be chosen randomly by com
+          .trader_id = trader_id
+        });
+      }
+
+      // Enter new bet
+      if (cumulative_signal_over_second > 0) {
+        previous_directional_bet_is_bid = 1;
+        place_order(com, Common::Order{
+          .ticker = 0,
+          .price = state.get_bbo(0, false)+0.01,
+          .quantity = 20,
+          .buy = true,
+          .ioc = true,
+          .order_id = 0, // this order ID will be chosen randomly by com
+          .trader_id = trader_id
+        });
+      } else if (cumulative_signal_over_second < 0) {
+        previous_directional_bet_is_bid = 0;
+        place_order(com, Common::Order{
+          .ticker = 0,
+          .price = state.get_bbo(0, true)-0.01,
+          .quantity = 20,
+          .buy = false,
+          .ioc = true,
+          .order_id = 0, // this order ID will be chosen randomly by com
+          .trader_id = trader_id
+        });
+      }
+
+      cumulative_signal_over_second = 0;
     }
 
-
-    // a way to cancel all your open orders
-    //for (const auto& x : state.open_orders) {
-    //  place_cancel(com, Common::Cancel{
-    //    .ticker = 0,
-    //    .order_id = x.first,
-    //    .trader_id = trader_id
-    //  });
-    //}
-
-    // a way to put in a bid of quantity 1 at the current best bid
-    double best_bid = state.get_bbo(0, true);
-    double best_offer = state.get_bbo(0, false);
-    double mid_price = state.get_mid_price(0);
-    double spread = state.get_spread(0);
-    double signal = state.get_signal(0);
-    double signalToCents = signal/10.0;
-    double newSpread = spread + signalToCents;
-    double new_bid, new_offer;
-    quantity_t position = state.positions[0];
-    double available_position = 2000 - position;
-    quantity_t bid_volume, offer_volume;
-
+    /* --------------- MAKER - MAKER STRATEGY ------------------- */
+    /*
     if (abs(previous_signal - signal) == 0) {
       return;
     } else if (signal > 0) {
@@ -525,7 +569,7 @@ public:
         place_order(com, Common::Order{
           .ticker = 0,
           .price = best_offer - 0.01,
-          .quantity = std::min(available_position, 200.0),
+          .quantity = std::min(available_position, 20.0),
           .buy = true,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -534,7 +578,7 @@ public:
         place_order(com, Common::Order{
           .ticker = 0,
           .price = best_offer + spread * (signal),
-          .quantity = std::min(available_position, 200.0),
+          .quantity = std::min(available_position, 20.0),
           .buy = false,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -566,7 +610,7 @@ public:
         place_order(com, Common::Order{
           .ticker = 0,
           .price = best_bid + spread * (signal),
-          .quantity = std::min(available_position, 200.0),
+          .quantity = std::min(available_position, 20.0),
           .buy = true,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -575,7 +619,7 @@ public:
         place_order(com, Common::Order{
           .ticker = 0,
           .price = best_bid + 0.01,
-          .quantity = std::min(available_position, 200.0),
+          .quantity = std::min(available_position, 20.0),
           .buy = false,
           .ioc = false,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -583,6 +627,7 @@ public:
         });
       }
     } 
+    */
   }
 
   // EDIT THIS METHOD
