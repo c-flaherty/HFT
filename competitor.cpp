@@ -534,6 +534,7 @@ public:
                 << "\n"
                 << "Signal: "
                 << state.get_signal(0)
+                << "\n"
                 << "Average Difference in Spread: "
                 << sum_diff_in_spread/num_updates
                 << "\n\n";
