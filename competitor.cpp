@@ -413,7 +413,8 @@ public:
   double meaningful_signal_diff;
   
   quantity_t bid_volume, ask_volume, position;
-  double best_bid, best_offer, signal_difference, mid_price, spread, signal;
+  double best_bid, best_offer, signal_difference, mid_price, spread, signal, t_minus_one_signal=2, t_minus_two_signal=2, avg_signal=0, previous_avg_signal;
+
 
   int64_t now;
 
@@ -464,6 +465,20 @@ public:
     now = time_ns();
     last = now;
 
+    if (t_minus_one_signal == 2) {
+      t_minus_one_signal = signal;
+      return;
+    } else if (t_minus_two_signal == 2) {
+      t_minus_two_signal = t_minus_one_signal;
+      t_minus_one_signal = signal;
+      return;
+    } else {
+      previous_signal = avg_signal;
+      avg_signal = (t_minus_two_signal + t_minus_one_signal + signal)/3;
+      t_minus_two_signal = t_minus_two_signal;
+      t_minus_one_signal = signal;
+    }
+
     if (now - cycle > 1e8) {
       cycle = now;
 
@@ -508,10 +523,10 @@ public:
     }
 
     /* --------------- MAKER - MAKER STRATEGY START------------------- */
-    signal_difference = abs(previous_signal - signal);
+    signal_difference = abs(avg_signal - previous_avg_signal);
     if (signal_difference == 0) {
       return;
-    } else if (signal > 0) {
+    } else if (avg_signal > 0) {
       // Move midprice up proportional to signal
       if (signal_difference > meaningful_signal_diff) {
         // Cancel all open orders
@@ -535,7 +550,7 @@ public:
         });
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = std::max(mid_price + 0.01, mid_price + spread * (signal)),
+          .price = std::max(mid_price + 0.01, mid_price + spread * (avg_signal)),
           .quantity = ask_volume,
           .buy = false,
           .ioc = false,
@@ -543,7 +558,7 @@ public:
           .trader_id = trader_id
         });
       }
-    } else if (signal < 0) {
+    } else if (avg_signal < 0) {
       // Move midprice down proportional to signal
       if (signal_difference > meaningful_signal_diff) {
         // Cancel all open orders
@@ -558,7 +573,7 @@ public:
         // Make new market
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = std::min(mid_price - 0.1, mid_price + spread * (signal)),
+          .price = std::min(mid_price - 0.1, mid_price + spread * (avg_signal)),
           .quantity = bid_volume,
           .buy = true,
           .ioc = false,
@@ -576,7 +591,8 @@ public:
         });
       }
     } 
-
+    previous_signal = signal;
+    previous_avg_signal = avg_signal;
    /* --------------- MAKER - MAKER STRATEGY END------------------- */
   }
 
