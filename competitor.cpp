@@ -557,7 +557,7 @@ public:
       place_order(com, Common::Order{
           .ticker = 0,
           .price = best_offer-0.01,
-          .quantity = 200,
+          .quantity = (2000-position)/2,
           .buy = false,
           .ioc = true,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -566,18 +566,17 @@ public:
       place_order(com, Common::Order{
           .ticker = 0,
           .price = best_bid,
-          .quantity = 200,
+          .quantity = (2000-position)/2,
           .buy = true,
           .ioc = true,
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
         });
-      return;
     } else if (bid_quote - ask_quote > 5000) {
       place_order(com, Common::Order{
           .ticker = 0,
           .price = best_offer,
-          .quantity = 200,
+          .quantity = (2000-position)/2,
           .buy = false,
           .ioc = true,
           .order_id = 0, // this order ID will be chosen randomly by com
@@ -586,13 +585,12 @@ public:
       place_order(com, Common::Order{
           .ticker = 0,
           .price = best_bid+0.01,
-          .quantity = 200,
+          .quantity = (2000-position)/2,
           .buy = true,
           .ioc = true,
           .order_id = 0, // this order ID will be chosen randomly by com
           .trader_id = trader_id
         });
-      return;
     }
 
     if (position > 240) {
