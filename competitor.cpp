@@ -421,7 +421,7 @@ public:
   // (maybe) EDIT THIS METHOD
   void init(Bot::Communicator& com) {
     state.trader_id = trader_id;
-    // state.log_path = "book.log";
+    state.log_path = "book.log";
 
     // Query User for input
     std::cout << "Please input the number of levels you want to use for signal (Suggested: 8): ";
