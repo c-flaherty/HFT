@@ -426,8 +426,6 @@ public:
     double mid_price = state.get_mid_price(0);
     double spread = state.get_spread(0);
     double signal = state.get_signal(0);
-    cumulative_signal_over_second += signal;
-    num_signals += 1;
     double signalToCents = signal/10.0;
     double newSpread = spread + signalToCents;
     double new_bid, new_offer;
@@ -438,8 +436,12 @@ public:
     int64_t now = time_ns();
     last = now;
 
+    /* -------------- DIRECTIONAL STRATEGY START --------------- */
+    /*
+    cumulative_signal_over_second += signal;
+    num_signals += 1;
+
     if (num_signals > 5) {
-      /* -------------- DIRECTIONAL STRATEGY --------------- */
 
       // Exit previous bet
       if (previous_directional_bet_is_bid == 1) {
@@ -492,6 +494,8 @@ public:
       cumulative_signal_over_second = 0;
       num_signals = 0;
     }
+    */
+    /* -------------- DIRECTIONAL STRATEGY END --------------- */
 
     if (now - cycle > 1e9) {
       cycle = now;
@@ -545,8 +549,8 @@ public:
       }
     }
 
-    /* --------------- MAKER - MAKER STRATEGY ------------------- */
-    /*
+    /* --------------- MAKER - MAKER STRATEGY START------------------- */
+
     if (abs(previous_signal - signal) == 0) {
       return;
     } else if (signal > 0) {
@@ -632,7 +636,8 @@ public:
         });
       }
     } 
-    */
+
+   /* --------------- MAKER - MAKER STRATEGY END------------------- */
   }
 
   // EDIT THIS METHOD
