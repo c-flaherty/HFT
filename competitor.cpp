@@ -467,7 +467,7 @@ public:
     if (now - cycle > 1e8) {
       cycle = now;
 
-      // state.books[0].print_book(state.log_path, state.open_orders);
+      state.books[0].print_book(state.log_path, state.open_orders);
 
       /*
       if (position > 20) {
@@ -498,9 +498,9 @@ public:
 
     if (position > 0) {
       bid_volume = mkt_volume;
-      ask_volume = mkt_volume + abs(signal) * position;
+      ask_volume = mkt_volume + position;
     } else {
-      bid_volume = mkt_volume + abs(signal) * abs(position);
+      bid_volume = mkt_volume + abs(position);
       ask_volume = mkt_volume;
     }
 
