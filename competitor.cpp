@@ -497,9 +497,9 @@ public:
           });
         }
 
-        if (spread < 0.05) {
-          return;
-        }
+        //if (spread < 0.05) {
+        //  return;
+        //}
 
         // Make new market
         new_bid = mid_price + signalToCents;
@@ -518,7 +518,7 @@ public:
         });
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = best_offer + spread,
+          .price = best_offer + spread * signal,
           .quantity = available_position/2.0,
           .buy = false,
           .ioc = false,
@@ -538,9 +538,9 @@ public:
           });
         }
 
-        if (spread < 0.05) {
-          return;
-        }
+        //if (spread < 0.05) {
+        //  return;
+        //}
 
         // Make new market
         new_bid = mid_price + signalToCents;
@@ -550,7 +550,7 @@ public:
 
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = best_bid - spread,
+          .price = best_bid - spread * signal,
           .quantity = available_position/2.0,
           .buy = true,
           .ioc = false,
