@@ -496,11 +496,14 @@ public:
       */
     }
 
-    if (position > 0) {
+    if (position > 200) {
       bid_volume = mkt_volume;
-      ask_volume = mkt_volume + position;
+      ask_volume = mkt_volume + 0.5 * position;
+    } else if (position < -200) {
+      bid_volume = mkt_volume + 0.5 * abs(position);
+      ask_volume = mkt_volume;
     } else {
-      bid_volume = mkt_volume + abs(position);
+      bid_volume = mkt_volume;
       ask_volume = mkt_volume;
     }
 
@@ -523,7 +526,7 @@ public:
         // Make new market
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = best_offer,
+          .price = mid_price,
           .quantity = bid_volume,
           .buy = true,
           .ioc = false,
@@ -532,7 +535,7 @@ public:
         });
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = std::max(best_offer + 0.01, best_offer + spread * (signal)),
+          .price = std::max(mid_price + 0.01, mid_price + spread * (signal)),
           .quantity = ask_volume,
           .buy = false,
           .ioc = false,
@@ -555,7 +558,7 @@ public:
         // Make new market
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = std::min(best_bid - 0.1, best_bid + spread * (signal)),
+          .price = std::min(mid_price - 0.1, mid_price + spread * (signal)),
           .quantity = bid_volume,
           .buy = true,
           .ioc = false,
@@ -564,7 +567,7 @@ public:
         });
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = best_bid,
+          .price = mid_price,
           .quantity = ask_volume,
           .buy = false,
           .ioc = false,
