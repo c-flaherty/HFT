@@ -496,9 +496,9 @@ public:
 
     if (position > 0) {
       bid_volume = mkt_volume;
-      ask_volume = mkt_volume + position;
+      ask_volume = mkt_volume + abs(signal) * position;
     } else {
-      bid_volume = mkt_volume + abs(position);
+      bid_volume = mkt_volume + abs(signal) * abs(position);
       ask_volume = mkt_volume;
     }
 
