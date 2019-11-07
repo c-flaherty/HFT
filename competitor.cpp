@@ -528,6 +528,7 @@ public:
 
     if (now - cycle > 1e9) {
       cycle = now;
+      /*
       std::cout << "Current PNL: " 
                 << state.get_pnl()
                 << "\nPNL/Second: "
@@ -558,6 +559,7 @@ public:
                 << "Average Difference in Spread: "
                 << sum_diff_in_spread/num_updates
                 << "\n\n";
+      */
 
       if (state.positions[0] > 20) {
         place_order(com, Common::Order{
