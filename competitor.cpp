@@ -554,7 +554,7 @@ public:
         });
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = std::max(mid_price + 0.01, mid_price + spread * (avg_signal)),
+          .price = std::max(mid_price + 0.01, mid_price + spread),
           .quantity = ask_volume,
           .buy = false,
           .ioc = false,
@@ -580,7 +580,7 @@ public:
         // Make new market
         place_order(com, Common::Order{
           .ticker = 0,
-          .price = std::min(mid_price - 0.1, mid_price + spread * (avg_signal)),
+          .price = std::min(mid_price - 0.1, mid_price + spread),
           .quantity = bid_volume,
           .buy = true,
           .ioc = false,
