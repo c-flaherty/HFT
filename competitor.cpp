@@ -528,7 +528,7 @@ public:
       return;
     } else if (avg_signal > 0) {
       // Move midprice up proportional to signal
-      if (signal_difference > meaningful_signal_diff) {
+      if (signal_difference > meaningful_signal_diff || abs(position) <= 20) {
         // Cancel all open orders
         for (const auto& x : state.open_orders) {
           place_cancel(com, Common::Cancel{
@@ -560,7 +560,7 @@ public:
       }
     } else if (avg_signal < 0) {
       // Move midprice down proportional to signal
-      if (signal_difference > meaningful_signal_diff) {
+      if (signal_difference > meaningful_signal_diff || abs(position) <= 20) {
         // Cancel all open orders
         for (const auto& x : state.open_orders) {
           place_cancel(com, Common::Cancel{
