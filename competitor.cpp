@@ -56,7 +56,9 @@ public:
       return 0.0;
     }
 
-    return (((side.begin())+1)->price);
+    std::set<LimitOrder>::iterator s = sides[buy].begin();
+    s++;
+    return (s->price);
   }
 
   price_t get_mid_price(price_t default_to) const {
