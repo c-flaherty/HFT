@@ -123,7 +123,7 @@ public:
       return;
     }
 
-    std::ofstream fout(fp);
+    std::ofstream fout(fp, std::fstream::app);
 
     fout << "offers\n";
     for (auto rit = sides[0].rbegin(); rit != sides[0].rend(); rit++) {
