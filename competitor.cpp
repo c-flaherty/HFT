@@ -49,6 +49,16 @@ public:
     return side.begin()->price;
   }
 
+  price_t get_2nd_bbo(bool buy) const {
+    const std::set<LimitOrder>&  side = sides[buy];
+
+    if (side.empty()) {
+      return 0.0;
+    }
+
+    return (((side.begin())+1)->price);
+  }
+
   price_t get_mid_price(price_t default_to) const {
     price_t best_bid = get_bbo(true);
     price_t best_offer = get_bbo(false);
@@ -351,33 +361,62 @@ public:
 
     last = now;
 
-
-    // a way to cancel all your open orders
-    for (const auto& x : state.open_orders) {
-      place_cancel(com, Common::Cancel{
-        .ticker = 0,
-        .order_id = x.first,
-        .trader_id = trader_id
-      });
-    }
-
-
-    // a way to get your current position
+    quantity_t bid_quote = state.books[0].quote_size(true);
+    quantity_t ask_quote = state.books[0].quote_size(false);
+    quantity_t mkt_volume = 400, bid_volume, ask_volume;
     quantity_t position = state.positions[0];
 
-    // a way to put in a bid of quantity 1 at the current best bid
-    double best_bid = state.get_bbo(0, true);
-    if (best_bid != 0.0 && position < 20) { // 0.0 denotes no bid
-
+    if (position > 80) {
+      bid_volume = mkt_volume;
+      ask_volume = mkt_volume + 0.5 * position;
+    } else if (position < -80) {
+      bid_volume = mkt_volume + 0.5 * abs(position);
+      ask_volume = mkt_volume;
+    } else {
+      bid_volume = mkt_volume;
+      ask_volume = mkt_volume;
+    }
+    
+    if (ask_quote - bid_quote > 2000) {
       place_order(com, Common::Order{
-        .ticker = 0,
-        .price = best_bid,
-        .quantity = 1,
-        .buy = true,
-        .ioc = false,
-        .order_id = 0, // this order ID will be chosen randomly by com
-        .trader_id = trader_id
-      });
+          .ticker = 0,
+          .price = state.books[0].get_2nd_bbo(false)-0.01,
+          .quantity = ask_volume,
+          .buy = false,
+          .ioc = false,
+          .order_id = 0, // this order ID will be chosen randomly by com
+          .trader_id = trader_id
+        });
+      place_order(com, Common::Order{
+          .ticker = 0,
+          .price = state.get_bbo(0, false),
+          .quantity = ask_volume,
+          .buy = true,
+          .ioc = false,
+          .order_id = 0, // this order ID will be chosen randomly by com
+          .trader_id = trader_id
+        });
+    } else if (bid_quote - ask_quote > 2000) {
+      place_order(com, Common::Order{
+          .ticker = 0,
+          .price = state.get_bbo(0, true),
+          .quantity = ask_volume,
+          .buy = false,
+          .ioc = false,
+          .order_id = 0, // this order ID will be chosen randomly by com
+          .trader_id = trader_id
+        });
+      place_order(com, Common::Order{
+          .ticker = 0,
+          .price = state.books[0].get_2nd_bbo(true)+0.01,
+          .quantity = bid_volume,
+          .buy = true,
+          .ioc = false,
+          .order_id = 0, // this order ID will be chosen randomly by com
+          .trader_id = trader_id
+        });
+    }
+
     }
 
   }
