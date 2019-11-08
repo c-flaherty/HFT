@@ -363,7 +363,7 @@ public:
 
     quantity_t bid_quote = state.books[0].quote_size(true);
     quantity_t ask_quote = state.books[0].quote_size(false);
-    quantity_t mkt_volume = 400, bid_volume, ask_volume;
+    quantity_t mkt_volume = 20, bid_volume, ask_volume;
     quantity_t position = state.positions[0];
 
     if (position > 80) {
@@ -416,9 +416,6 @@ public:
           .trader_id = trader_id
         });
     }
-
-    }
-
   }
 
   // EDIT THIS METHOD
