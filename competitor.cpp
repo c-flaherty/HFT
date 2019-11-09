@@ -423,7 +423,7 @@ public:
       ask_volume = mkt_volume;
     }
 
-    double signal = state.books[0].get_signal(8);
+    double signal = state.books[0].get_signal(30);
     if (signal > 0) {
       ask_price = mid_price + spread/2;
       bid_price = mid_price - spread/4;
