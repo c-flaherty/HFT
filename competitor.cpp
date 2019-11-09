@@ -85,7 +85,7 @@ public:
         continue;
       }
       weight = 1 - abs(best_bid - bid_level->price)/best_bid;
-      bid_volume += weight * (bid_level->quantity);
+      bid_volume += (bid_level->quantity);
       bid_level++;
     }
 
@@ -97,7 +97,7 @@ public:
         continue;
       }
       weight = 1 - abs(ask_level->price - best_offer)/best_offer;
-      ask_volume += weight * (ask_level->quantity);
+      ask_volume += (ask_level->quantity);
       ask_level++;
     }
 
