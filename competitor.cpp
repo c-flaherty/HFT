@@ -61,6 +61,46 @@ public:
     return (s->price);
   }
 
+  /* ---USE THIS FUNCTION TO GENERATE A SIGNAL---
+  Currently, I calculate bid and ask volume for all levels.
+  I then calculate (bid_vol - ask_vol)/(bid_vol + ask_vol)
+  */
+  double get_signal(int num_levels) const {
+    bool bid = true, ask = false;
+    price_t best_bid = get_bbo(bid);
+    price_t best_offer = get_bbo(ask);
+
+    double signal = 0.0;
+
+    if (best_bid == 0.0 || best_offer == 0.0) {
+      return signal; // no signal can be found in this case
+    }
+
+    double weight;
+    // Calculate bid volume for up to n levels
+    quantity_t bid_volume = 0;
+    std::set<LimitOrder>::iterator bid_level=sides[1].begin();
+    for (int i = 0; i<num_levels && bid_level!=sides[1].end(); i++) {
+      weight = 1 - abs(best_bid - bid_level->price)/best_bid;
+      bid_volume += weight * (bid_level->quantity);
+      bid_level++;
+    }
+
+    // Calculate ask volume for up to n levels
+    quantity_t ask_volume = 0;
+    std::set<LimitOrder>::iterator ask_level=sides[0].begin();
+    for (int i = 0; i<num_levels && ask_level!=sides[0].end(); i++) {
+      weight = 1 - abs(ask_level->price - best_offer)/best_offer;
+      ask_volume += weight * (ask_level->quantity);
+      ask_level++;
+    }
+
+    // Calculate signal
+    signal = ((double)bid_volume - (double)ask_volume)/((double)bid_volume + (double)ask_volume);
+
+    return signal;
+  }
+
   price_t get_mid_price(price_t default_to) const {
     price_t best_bid = get_bbo(true);
     price_t best_offer = get_bbo(false);
@@ -331,7 +371,7 @@ public:
   // (maybe) EDIT THIS METHOD
   void init(Bot::Communicator& com) {
     state.trader_id = trader_id;
-    state.log_path = "book.log";
+    // state.log_path = "book.log";
     start_time = time_ns();
   }
 
@@ -367,57 +407,52 @@ public:
     quantity_t ask_quote = state.books[0].quote_size(false);
     quantity_t mkt_volume = 20, bid_volume, ask_volume;
     quantity_t position = state.positions[0];
+    price_t bid_price, ask_price;
 
-    if (position > 80) {
+    if (position > 0) {
       bid_volume = mkt_volume;
-      ask_volume = mkt_volume + 0.5 * position;
-    } else if (position < -80) {
-      bid_volume = mkt_volume + 0.5 * abs(position);
+      ask_volume = mkt_volume + 0.25 * position;
+    } else if (position <= 0) {
+      bid_volume = mkt_volume + 0.25 * abs(position);
       ask_volume = mkt_volume;
+    }
+
+    double signal = state.books[0].get_signal(8);
+    if (signal > 0) {
+      ask_price = state.books[0].get_2nd_bbo(false);
+      bid_price = state.get_bbo(false);
+    } else if (signal < 0) {
+      ask_price = state.get_bbo(true);
+      bid_price = state.books[0].get_2nd_bbo(true);
     } else {
-      bid_volume = mkt_volume;
-      ask_volume = mkt_volume;
+      return;
+    }
+
+    if (ask_quote - bid_quote > 2000) {
+      ask_price = state.books[0].get_2nd_bbo(false);
+    } else if (bid_quote - ask_quote > 2000) {
+      bid_price =  state.books[0].get_2nd_bbo(false);
     }
     
-    if (ask_quote - bid_quote > 2000) {
-      place_order(com, Common::Order{
-          .ticker = 0,
-          .price = state.books[0].get_2nd_bbo(false)-0.01,
-          .quantity = ask_volume,
-          .buy = false,
-          .ioc = false,
-          .order_id = 0, // this order ID will be chosen randomly by com
-          .trader_id = trader_id
-        });
-      place_order(com, Common::Order{
-          .ticker = 0,
-          .price = state.get_bbo(0, false),
-          .quantity = ask_volume,
-          .buy = true,
-          .ioc = false,
-          .order_id = 0, // this order ID will be chosen randomly by com
-          .trader_id = trader_id
-        });
-    } else if (bid_quote - ask_quote > 2000) {
-      place_order(com, Common::Order{
-          .ticker = 0,
-          .price = state.get_bbo(0, true),
-          .quantity = ask_volume,
-          .buy = false,
-          .ioc = false,
-          .order_id = 0, // this order ID will be chosen randomly by com
-          .trader_id = trader_id
-        });
-      place_order(com, Common::Order{
-          .ticker = 0,
-          .price = state.books[0].get_2nd_bbo(true)+0.01,
-          .quantity = bid_volume,
-          .buy = true,
-          .ioc = false,
-          .order_id = 0, // this order ID will be chosen randomly by com
-          .trader_id = trader_id
-        });
-    }
+    
+    place_order(com, Common::Order{
+        .ticker = 0,
+        .price = ask_price,
+        .quantity = ask_volume,
+        .buy = false,
+        .ioc = false,
+        .order_id = 0, // this order ID will be chosen randomly by com
+        .trader_id = trader_id
+      });
+    place_order(com, Common::Order{
+        .ticker = 0,
+        .price = bid_price,
+        .quantity = bid_volume,
+        .buy = true,
+        .ioc = false,
+        .order_id = 0, // this order ID will be chosen randomly by com
+        .trader_id = trader_id
+      });
   }
 
   // EDIT THIS METHOD
