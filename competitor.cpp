@@ -82,7 +82,7 @@ public:
     quantity_t bid_volume = 0;
     std::set<LimitOrder>::iterator bid_level=sides[1].begin();
     for (int i = 0; i<num_levels && bid_level!=sides[1].end(); i++) {
-      if (bid_level -> quantity > 2000) {
+      if (bid_level -> quantity > 10000) {
         bid_level++;
         continue;
       }
@@ -95,7 +95,7 @@ public:
     quantity_t ask_volume = 0;
     std::set<LimitOrder>::iterator ask_level=sides[0].begin();
     for (int i = 0; i<num_levels && ask_level!=sides[0].end(); i++) {
-      if (ask_level -> quantity > 2000) {
+      if (ask_level -> quantity > 10000) {
         ask_level++;
         continue;
       }
