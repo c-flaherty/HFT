@@ -424,10 +424,10 @@ public:
     }
 
     double signal = state.books[0].get_signal(8);
-    if (signal > 0.25) {
+    if (signal > 0) {
       ask_price = mid_price + spread/4;
       bid_price = mid_price - spread/4;
-    } else if (signal < -0.25) {
+    } else if (signal < 0) {
       ask_price = mid_price + spread/4;
       bid_price = mid_price - spread/4;
     } else {
