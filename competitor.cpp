@@ -407,7 +407,7 @@ public:
     quantity_t ask_quote = state.books[0].quote_size(false);
     quantity_t mkt_volume = 20, bid_volume, ask_volume;
     quantity_t position = state.positions[0];
-    price_t bid_price, ask_price;
+    price_t bid_price, ask_price, mid_price = state.books[0].get_mid_price(state.last_trade_price), spread = state.books[0].spread();
 
     if (position > 0) {
       bid_volume = mkt_volume;
@@ -419,19 +419,19 @@ public:
 
     double signal = state.books[0].get_signal(8);
     if (signal > 0.25) {
-      ask_price = state.books[0].get_2nd_bbo(false);
-      bid_price = state.get_bbo(0, false);
+      ask_price = mid_price + (1 + signal) * spread;
+      bid_price = mid_price;
     } else if (signal < 0.25) {
-      ask_price = state.get_bbo(0, true);
-      bid_price = state.books[0].get_2nd_bbo(true);
+      ask_price = mid_price;
+      bid_price = mid_price + (1 - signal) * spread;
     } else {
       return;
     }
 
     if (ask_quote - bid_quote > 2000) {
-      ask_price = state.books[0].get_2nd_bbo(false);
+      ask_price = state.books[0].get_2nd_bbo(false)-0.1;
     } else if (bid_quote - ask_quote > 2000) {
-      bid_price =  state.books[0].get_2nd_bbo(false);
+      bid_price =  state.books[0].get_2nd_bbo(true)+0.1;
     }
     
     place_order(com, Common::Order{
