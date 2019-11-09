@@ -414,6 +414,7 @@ public:
     quantity_t mkt_volume = 40, bid_volume, ask_volume;
     quantity_t position = state.positions[0];
     price_t bid_price, ask_price, mid_price = state.books[0].get_mid_price(state.last_trade_price), spread = state.books[0].spread();
+    price_t best_bid = state.get_bbo(0, true), best_ask = state.get_bbo(0, false);
 
     if (position > 0) {
       bid_volume = mkt_volume;
@@ -425,13 +426,21 @@ public:
 
     double signal = state.books[0].get_signal(30);
     if (signal > 0) {
-      ask_price = mid_price + spread/2;
-      bid_price = mid_price - spread/4;
+      ask_price = best_ask + signal*spread;
+      bid_price = best_bid + signal*spread;
     } else if (signal < 0) {
-      ask_price = mid_price + spread/4;
-      bid_price = mid_price - spread/2;
+      ask_price = best_ask + signal*spread;
+      bid_price = best_bid + signal*spread;
     } else {
       return;
+    }
+
+    for (const auto& x : state.open_orders) {      
+      place_cancel(com, Common::Cancel{
+        .ticker = 0,
+        .order_id = x.first,
+        .trader_id = trader_id
+      });
     }
     
     place_order(com, Common::Order{
@@ -452,14 +461,6 @@ public:
         .order_id = 0, // this order ID will be chosen randomly by com
         .trader_id = trader_id
       });
-    
-    for (const auto& x : state.open_orders) {      
-      place_cancel(com, Common::Cancel{
-        .ticker = 0,
-        .order_id = x.first,
-        .trader_id = trader_id
-      });
-    }
   }
 
   // EDIT THIS METHOD
