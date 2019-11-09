@@ -420,17 +420,17 @@ public:
 
     if (position > 0) {
       bid_volume = mkt_volume;
-      ask_volume = mkt_volume + 0.25 * position;
+      ask_volume = mkt_volume + 0.5 * position;
     } else if (position <= 0) {
-      bid_volume = mkt_volume + 0.25 * abs(position);
+      bid_volume = mkt_volume + 0.5 * abs(position);
       ask_volume = mkt_volume;
     }
 
     double signal = state.books[0].get_signal(30);
-    if (signal > 0) {
+    if (signal > 0.2) {
       ask_price = best_ask + (1+signal)*spread;
       bid_price = mid_price;
-    } else if (signal < 0) {
+    } else if (signal < -0.2) {
       ask_price = mid_price;
       bid_price = best_bid + (1+signal)*spread;
     } else {
