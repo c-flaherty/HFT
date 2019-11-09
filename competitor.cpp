@@ -434,7 +434,6 @@ public:
       bid_price =  state.books[0].get_2nd_bbo(false);
     }
     
-    
     place_order(com, Common::Order{
         .ticker = 0,
         .price = ask_price,
@@ -453,6 +452,14 @@ public:
         .order_id = 0, // this order ID will be chosen randomly by com
         .trader_id = trader_id
       });
+    
+    for (const auto& x : state.open_orders) {      
+      place_cancel(com, Common::Cancel{
+        .ticker = 0,
+        .order_id = x.first,
+        .trader_id = trader_id
+      });
+    }
   }
 
   // EDIT THIS METHOD
