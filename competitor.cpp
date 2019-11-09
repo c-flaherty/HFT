@@ -81,6 +81,9 @@ public:
     quantity_t bid_volume = 0;
     std::set<LimitOrder>::iterator bid_level=sides[1].begin();
     for (int i = 0; i<num_levels && bid_level!=sides[1].end(); i++) {
+      if (bid_level -> quantity > 5000) {
+        continue;
+      }
       weight = 1 - abs(best_bid - bid_level->price)/best_bid;
       bid_volume += weight * (bid_level->quantity);
       bid_level++;
@@ -90,6 +93,9 @@ public:
     quantity_t ask_volume = 0;
     std::set<LimitOrder>::iterator ask_level=sides[0].begin();
     for (int i = 0; i<num_levels && ask_level!=sides[0].end(); i++) {
+      if (ask_level -> quantity > 5000) {
+        continue;
+      }
       weight = 1 - abs(ask_level->price - best_offer)/best_offer;
       ask_volume += weight * (ask_level->quantity);
       ask_level++;
@@ -405,7 +411,7 @@ public:
 
     quantity_t bid_quote = state.books[0].quote_size(true);
     quantity_t ask_quote = state.books[0].quote_size(false);
-    quantity_t mkt_volume = 80, bid_volume, ask_volume;
+    quantity_t mkt_volume = 40, bid_volume, ask_volume;
     quantity_t position = state.positions[0];
     price_t bid_price, ask_price, mid_price = state.books[0].get_mid_price(state.last_trade_price), spread = state.books[0].spread();
 
@@ -419,19 +425,13 @@ public:
 
     double signal = state.books[0].get_signal(8);
     if (signal > 0.25) {
-      ask_price = std::min(mid_price + (1 + signal) * spread, state.books[0].get_2nd_bbo(false));
-      bid_price = mid_price;
+      ask_price = mid_price + spread/2;
+      bid_price = mid_price - spread/2;
     } else if (signal < -0.25) {
-      ask_price = mid_price;
-      bid_price = std::max(mid_price + (1 - signal) * spread, state.books[0].get_2nd_bbo(true));
+      ask_price = mid_price + spread/2;
+      bid_price = mid_price - spread/2;
     } else {
       return;
-    }
-
-    if (ask_quote - bid_quote > 2000) {
-      ask_price = state.books[0].get_2nd_bbo(false)-0.1;
-    } else if (bid_quote - ask_quote > 2000) {
-      bid_price =  state.books[0].get_2nd_bbo(true)+0.1;
     }
     
     place_order(com, Common::Order{
