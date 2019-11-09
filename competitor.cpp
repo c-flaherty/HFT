@@ -66,7 +66,7 @@ public:
   I then calculate (bid_vol - ask_vol)/(bid_vol + ask_vol). 
   I also weight volumes by the number of levels away they are from the touch point.
   */
-  double get_signal(int num_levels) const {
+  double get_signal() const {
     bool bid = true, ask = false;
     price_t best_bid = get_bbo(bid);
     price_t best_offer = get_bbo(ask);
@@ -81,7 +81,7 @@ public:
     // Calculate bid volume for up to n levels
     quantity_t bid_volume = 0;
     std::set<LimitOrder>::iterator bid_level=sides[1].begin();
-    for (int i = 0; i<num_levels && bid_level!=sides[1].end(); i++) {
+    for (int i = 0; bid_level!=sides[1].end(); i++) {
       if (bid_level -> quantity > 10000) {
         bid_level++;
         continue;
@@ -94,7 +94,7 @@ public:
     // Calculate ask volume for up to n levels
     quantity_t ask_volume = 0;
     std::set<LimitOrder>::iterator ask_level=sides[0].begin();
-    for (int i = 0; i<num_levels && ask_level!=sides[0].end(); i++) {
+    for (int i = 0; ask_level!=sides[0].end(); i++) {
       if (ask_level -> quantity > 10000) {
         ask_level++;
         continue;
@@ -424,24 +424,13 @@ public:
       ask_volume = mkt_volume;
     }
 
-    double signal = state.books[0].get_signal(30);
-    /*
+    double signal = state.books[0].get_signal();
     if (signal > 0.2) {
       ask_price = best_ask + (1+signal)*spread;
       bid_price = mid_price;
     } else if (signal < -0.2) {
       ask_price = mid_price;
       bid_price = best_bid + (1+signal)*spread;
-    } else {
-      return;
-    }
-    */
-    if (signal > 0.2) {
-      ask_price = (1+signal)*mid_price + spread/2;
-      bid_price = (1+signal)*mid_price - spread/2;;
-    } else if (signal < -0.2) {
-      ask_price = (1+signal)*mid_price + spread/2;
-      bid_price = (1+signal)*mid_price - spread/2;
     } else {
       return;
     }
