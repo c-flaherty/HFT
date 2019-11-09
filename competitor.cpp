@@ -62,8 +62,9 @@ public:
   }
 
   /* ---USE THIS FUNCTION TO GENERATE A SIGNAL---
-  Currently, I calculate bid and ask volume for all levels.
-  I then calculate (bid_vol - ask_vol)/(bid_vol + ask_vol)
+  Currently, I calculate bid and ask volume for 8 levels.
+  I then calculate (bid_vol - ask_vol)/(bid_vol + ask_vol). 
+  I also weight volumes by the number of levels away they are from the touch point.
   */
   double get_signal(int num_levels) const {
     bool bid = true, ask = false;
@@ -81,7 +82,7 @@ public:
     quantity_t bid_volume = 0;
     std::set<LimitOrder>::iterator bid_level=sides[1].begin();
     for (int i = 0; i<num_levels && bid_level!=sides[1].end(); i++) {
-      if (bid_level -> quantity > 20000) {
+      if (bid_level -> quantity > 2000) {
         bid_level++;
         continue;
       }
@@ -94,7 +95,7 @@ public:
     quantity_t ask_volume = 0;
     std::set<LimitOrder>::iterator ask_level=sides[0].begin();
     for (int i = 0; i<num_levels && ask_level!=sides[0].end(); i++) {
-      if (ask_level -> quantity > 20000) {
+      if (ask_level -> quantity > 2s000) {
         ask_level++;
         continue;
       }
@@ -399,9 +400,6 @@ public:
   // EDIT THIS METHOD
   void on_order_update(Common::OrderUpdate & update, Bot::Communicator& com){
     state.on_order_update(update);
-
-    // NOTE: the strategy here is dumb, and is just to demonstrate the API
-
 
     // a way to rate limit yourself
     int64_t now = time_ns();
