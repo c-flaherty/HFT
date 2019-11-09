@@ -420,9 +420,9 @@ public:
     double signal = state.books[0].get_signal(8);
     if (signal > 0) {
       ask_price = state.books[0].get_2nd_bbo(false);
-      bid_price = state.get_bbo(false);
+      bid_price = state.get_bbo(0, false);
     } else if (signal < 0) {
-      ask_price = state.get_bbo(true);
+      ask_price = state.get_bbo(0, true);
       bid_price = state.books[0].get_2nd_bbo(true);
     } else {
       return;
