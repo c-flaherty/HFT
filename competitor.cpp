@@ -425,12 +425,23 @@ public:
     }
 
     double signal = state.books[0].get_signal(30);
+    /*
     if (signal > 0.2) {
       ask_price = best_ask + (1+signal)*spread;
       bid_price = mid_price;
     } else if (signal < -0.2) {
       ask_price = mid_price;
       bid_price = best_bid + (1+signal)*spread;
+    } else {
+      return;
+    }
+    */
+    if (signal > 0.2) {
+      ask_price = (1+signal)*mid_price + spread/2;
+      bid_price = (1+signal)*mid_price - spread/2;;
+    } else if (signal < -0.2) {
+      ask_price = (1+signal)*mid_price + spread/2;
+      bid_price = (1+signal)*mid_price - spread/2;
     } else {
       return;
     }
