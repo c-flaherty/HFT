@@ -428,13 +428,13 @@ public:
       return;
     }
 
-    /*
     if (ask_quote - bid_quote > 2000) {
+      return
       ask_price = state.books[0].get_2nd_bbo(false)-0.1;
     } else if (bid_quote - ask_quote > 2000) {
+      return
       bid_price =  state.books[0].get_2nd_bbo(true)+0.1;
     }
-    */
     
     place_order(com, Common::Order{
         .ticker = 0,
