@@ -405,7 +405,7 @@ public:
 
     quantity_t bid_quote = state.books[0].quote_size(true);
     quantity_t ask_quote = state.books[0].quote_size(false);
-    quantity_t mkt_volume = 100, bid_volume, ask_volume;
+    quantity_t mkt_volume = 80, bid_volume, ask_volume;
     quantity_t position = state.positions[0];
     price_t bid_price, ask_price, mid_price = state.books[0].get_mid_price(state.last_trade_price), spread = state.books[0].spread();
 
@@ -419,11 +419,11 @@ public:
 
     double signal = state.books[0].get_signal(8);
     if (signal > 0.25) {
-      ask_price = mid_price + (1 + signal) * spread;
+      ask_price = std::min(mid_price + (1 + signal) * spread, state.books[0].get_2nd_bbo(false));
       bid_price = mid_price;
-    } else if (signal < 0.25) {
+    } else if (signal < -0.25) {
       ask_price = mid_price;
-      bid_price = mid_price + (1 - signal) * spread;
+      bid_price = std::max(mid_price + (1 - signal) * spread, state.books[0].get_2nd_bbo(true));
     } else {
       return;
     }
