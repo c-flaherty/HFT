@@ -81,11 +81,12 @@ public:
     quantity_t bid_volume = 0;
     std::set<LimitOrder>::iterator bid_level=sides[1].begin();
     for (int i = 0; i<num_levels && bid_level!=sides[1].end(); i++) {
-      if (bid_level -> quantity > 5000) {
+      if (bid_level -> quantity > 20000) {
+        bid_level++;
         continue;
       }
       weight = 1 - abs(best_bid - bid_level->price)/best_bid;
-      bid_volume += (bid_level->quantity);
+      bid_volume += weight * (bid_level->quantity);
       bid_level++;
     }
 
@@ -93,11 +94,12 @@ public:
     quantity_t ask_volume = 0;
     std::set<LimitOrder>::iterator ask_level=sides[0].begin();
     for (int i = 0; i<num_levels && ask_level!=sides[0].end(); i++) {
-      if (ask_level -> quantity > 5000) {
+      if (ask_level -> quantity > 20000) {
+        ask_level++;
         continue;
       }
       weight = 1 - abs(ask_level->price - best_offer)/best_offer;
-      ask_volume += (ask_level->quantity);
+      ask_volume += weight * (ask_level->quantity);
       ask_level++;
     }
 
@@ -427,9 +429,9 @@ public:
     double signal = state.books[0].get_signal(30);
     if (signal > 0) {
       ask_price = best_ask + signal*spread;
-      bid_price = best_bid + signal*spread;
+      bid_price = mid_price;
     } else if (signal < 0) {
-      ask_price = best_ask + signal*spread;
+      ask_price = mid_price;
       bid_price = best_bid + signal*spread;
     } else {
       return;
