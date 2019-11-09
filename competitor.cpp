@@ -405,7 +405,7 @@ public:
 
     quantity_t bid_quote = state.books[0].quote_size(true);
     quantity_t ask_quote = state.books[0].quote_size(false);
-    quantity_t mkt_volume = 80, bid_volume, ask_volume;
+    quantity_t mkt_volume = 200, bid_volume, ask_volume;
     quantity_t position = state.positions[0];
     price_t bid_price, ask_price, mid_price = state.books[0].get_mid_price(state.last_trade_price), spread = state.books[0].spread();
 
@@ -429,10 +429,8 @@ public:
     }
 
     if (ask_quote - bid_quote > 2000) {
-      return;
       ask_price = state.books[0].get_2nd_bbo(false)-0.1;
     } else if (bid_quote - ask_quote > 2000) {
-      return;
       bid_price =  state.books[0].get_2nd_bbo(true)+0.1;
     }
     
